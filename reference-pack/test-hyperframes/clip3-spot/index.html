@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="it"><head><meta charset="UTF-8"/><meta name="viewport" content="width=1080, height=1920"/>
+<script src="assets/js/gsap.min.js"></script>
+<style>
+:root{--ink:#ffffff;--brand:#E8322B}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#222}
+#root{width:1080px;height:1920px;position:relative;font-family:"Open Sans",sans-serif}
+#plate{position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover}
+.sub{position:absolute;left:0;width:1080px;top:1180px;text-align:center;color:var(--ink);font-size:46px;font-weight:600;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+#sticker{position:absolute;left:390px;top:700px;width:300px;height:300px}
+#sticker .s{position:absolute;inset:0;border-radius:50%;background:var(--brand);box-shadow:0 14px 30px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;color:#fff;font-family:"Archivo Black",sans-serif;font-size:54px;letter-spacing:.02em}
+</style></head><body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="7" data-width="1080" data-height="1920">
+ <video id="plate" class="clip" src="assets/mascotte.mp4" data-start="0" data-duration="7" data-track-index="0" muted playsinline></video>
+ <div id="sub1" class="clip sub" data-start="0.4" data-duration="2.2" data-track-index="1" data-var-text="sub1">Qui il segnale non arriva.</div>
+ <div id="sub2" class="clip sub" data-start="2.8" data-duration="2.0" data-track-index="2" data-var-text="sub2">Oh. Che peccato.</div>
+ <div id="sticker" class="clip" data-start="5.0" data-duration="2.0" data-track-index="3"><div class="s">BELUGA</div></div>
+ <audio id="a_pop" class="clip" src="assets/sfx/pop.mp3" data-start="5.0" data-track-index="10" data-volume="0.9"></audio>
+ <audio id="a_hit" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="5.0" data-track-index="11" data-volume="0.5"></audio>
+</div>
+<script>
+const tl=gsap.timeline({paused:true});
+// sticker slap: on twos (stepped) to match stop-motion
+tl.fromTo("#sticker .s",{scale:0,rotation:-25},{scale:1,rotation:-8,duration:.33,ease:"back.out(2.2)"},5.0);
+tl.to("#sticker .s",{rotation:-6,duration:1.6,ease:"steps(8)"},5.35);
+window.__timelines["main"]=tl;
+tl.seek(0);
+</script></body></html>

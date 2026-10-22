@@ -1,0 +1,7 @@
+source: https://vimeo.com/103954499 (BUCK official upload; embed referenced on aescripts.com/learn/Cox-Out-Of-The-Blue)
+width=1920
+height=1080
+r_frame_rate=30000/1001
+duration=60.031667
+scene_frames: 1 (of 1 detected at threshold 0.3; evenly subsampled when over 40)
+time_frames: 30 (1 frame every 2 s, added because the film uses continuous morph transitions with almost no hard cuts)
