@@ -2,6 +2,12 @@
 
 Si parte da qui per ogni nuova idea. Si scelgono 1-3 categorie, si apre la loro `SCHEDA.md` e il `reference.csv`, e si parte dalle clip in `clip/`.
 
+## Da dove parte il creative director
+
+Prima di scegliere una categoria si segue il [metodo di direzione creativa](direzione-creativa/METODO.md): brief, insight, tre territori, direzione artistica, storyboard, review. Modelli pronti in `direzione-creativa/modelli/`.
+
+## Categorie di stile
+
 | Se il brief dice... | Categoria | Stato |
 | --- | --- | --- |
 | reel, TikTok, Shorts, "deve fermare lo scroll", lancio social | [16 Hook per short](categorie/16-hook-per-short/SCHEDA.md) | completa: scheda, 29 reference, 12 clip 9:16 con parametri |
