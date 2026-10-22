@@ -17,6 +17,7 @@ Prima di scegliere una categoria si segue il [metodo di direzione creativa](dire
 | app, software, funzione nuova, lancio SaaS, walkthrough | [09 Demo UI e prodotto](categorie/09-demo-ui-prodotto/SCHEDA.md) | scheda, 3 reference |
 | "perché succede", storia, documentario, giornalismo | [06 Collage e carta](categorie/06-collage-carta/SCHEDA.md) | scheda, 7 reference, skill vox-explainer |
 | lancio, manifesto, citazione, lyric video, titoli di testa | [01 Kinetic typography](categorie/01-kinetic-typography/SCHEDA.md) | scheda, 9 reference |
+| tech amichevole, prodotto simpatico, clay, plastilina, 3D pastello | [03 3D morbido e clay](categorie/03-3d-morbido-clay/SCHEDA.md) | scheda, 6 reference |
 | mascotte, personaggio, serie con lo stesso protagonista, spot con dialogo | [Mascotte con Kling](categorie/mascotte-kling/SCHEDA.md) | scheda, 5 reference, prompt base, test spot in `test-hyperframes/clip3-spot` |
 
 Tutti i 20 stili, con firma visiva e quando usarli, sono nella [mappa degli stili](MAPPA-STILI.md). Le schede mancanti arrivano una per sessione.
