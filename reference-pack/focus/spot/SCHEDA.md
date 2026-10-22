@@ -107,3 +107,9 @@ Da **HF** `story.md`: incrociare un espediente con una forma.
 - Parole vietate se non misurate: "rivoluzionario", "senza sforzo", "in pochi secondi", "sblocca".
 - Patina digitale perfetta senza persone: oggi le giurie premiano il contrario.
 - Persone che parlano in camera e spiegano il prodotto per tutto lo spot.
+
+## Collegamenti
+- Reference: [reference.csv](reference.csv)
+- Analisi spot per spot: [analisi](analisi/LEGGIMI.md)
+- Skill esterne: [SKILLS.md](SKILLS.md)
+- [Motion design 3D](../3d-motion/SCHEDA.md)
