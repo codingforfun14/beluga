@@ -1,0 +1,83 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:I;font-weight:300;src:url(../../fonts/inter/inter-latin-300-normal.woff2)}
+@font-face{font-family:I;font-weight:500;src:url(../../fonts/inter/inter-latin-500-normal.woff2)}
+@font-face{font-family:I;font-weight:600;src:url(../../fonts/inter/inter-latin-600-normal.woff2)}
+@font-face{font-family:I;font-weight:700;src:url(../../fonts/inter/inter-latin-700-normal.woff2)}
+@font-face{font-family:Serif;src:url(../../fonts/dm-serif-display/dm-serif-display-latin-400-normal.woff2)}
+html,body{margin:0;background:#000}</style></head><body><canvas id="c" width="1280" height="720"></canvas>
+<script>
+// Categoria 11 "Corporate serio": movimento lento e pulito, un solo accento, niente effetti decorativi.
+const W=1280,H=720,D=4,cv=document.getElementById('c'),x=cv.getContext('2d');
+const cl=(v,a=0,b=1)=>Math.min(b,Math.max(a,v)),p=(t,a,b)=>cl((t-a)/(b-a));
+const oC=t=>1-Math.pow(1-t,3),oQ=t=>1-Math.pow(1-t,4),ioC=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const lerp=(a,b,t)=>a+(b-a)*t,TAU=Math.PI*2;
+const NAVY='#0B1F3A',NAVY2='#132C4F',ACC='#19C2A0',GOLD='#C9A227',LIGHT='#F5F7FA',INK='#0B1F3A',MUT='#6B7A90';
+function bg(c){x.fillStyle=c;x.fillRect(0,0,W,H)}
+function grid(c){x.save();x.strokeStyle=c;x.lineWidth=1;for(let i=0;i<=W;i+=80){x.beginPath();x.moveTo(i,0);x.lineTo(i,H);x.stroke()}for(let j=0;j<=H;j+=80){x.beginPath();x.moveTo(0,j);x.lineTo(W,j);x.stroke()}x.restore()}
+function T(s,X,Y,f,c,al='left',a=1,dy=0){if(a<=0)return;x.save();x.globalAlpha=a;x.font=f;x.textAlign=al;x.textBaseline='middle';x.fillStyle=c;x.fillText(s,X,Y+dy);x.restore()}
+function up(s,X,Y,f,c,t,t0,al='left'){const k=oQ(p(t,t0,t0+.7));T(s,X,Y,f,c,al,k,18*(1-k))}
+function rr(X,Y,w,h,r){x.beginPath();x.roundRect(X,Y,w,h,r)}
+function card(X,Y,w,h,fill='#fff',sh=.12,r=16){x.save();x.shadowColor=`rgba(11,31,58,${sh})`;x.shadowBlur=40;x.shadowOffsetY=14;rr(X,Y,w,h,r);x.fillStyle=fill;x.fill();x.restore()}
+const eur=(v,d=0)=>v.toLocaleString('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d});
+function label(i,name,dark){x.save();x.font='500 15px I';x.textAlign='left';x.textBaseline='alphabetic';x.fillStyle=dark?'rgba(255,255,255,.5)':'rgba(11,31,58,.45)';x.fillText('11.'+String(i).padStart(2,'0')+'  '+name,28,H-28);x.restore()}
+function line(pts,prog,c,w){const n=pts.length-1,f=prog*n,k=Math.floor(f);x.save();x.strokeStyle=c;x.lineWidth=w;x.lineJoin='round';x.lineCap='round';x.beginPath();for(let i=0;i<=Math.min(k,n);i++)i?x.lineTo(...pts[i]):x.moveTo(...pts[i]);if(k<n){const a=pts[k],b=pts[k+1];x.lineTo(lerp(a[0],b[0],f-k),lerp(a[1],b[1],f-k))}x.stroke();x.restore()}
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let r=Math.imul(s^s>>>15,1|s);r=r+Math.imul(r^r>>>7,61|r)^r;return((r^r>>>14)>>>0)/4294967296}}
+const series=(n,seed,base,drift,vol)=>{const r=rng(seed);let v=base;return Array.from({length:n},()=>{v+=drift+(r()-.5)*vol;return v})};
+
+const S=[
+['Claim istituzionale',true,t=>{bg(NAVY);grid('rgba(255,255,255,.035)');
+ x.fillStyle=ACC;x.fillRect(160,250,lerp(0,64,oQ(p(t,.1,.6))),3);up('INVESTIMENTI IMMOBILIARI',160,220,'600 18px I','rgba(255,255,255,.7)',t,.2);
+ up('Il patrimonio',160,310,'600 76px I','#fff',t,.45);up('che lavora per te.',160,400,'600 76px I','#fff',t,.65);
+ up('Rendimenti trasparenti, rischio sotto controllo.',160,490,'300 28px I','rgba(255,255,255,.75)',t,1.0);}],
+['KPI che crescono',false,t=>{bg(LIGHT);up('Risultati 2026',120,120,'600 44px I',INK,t,0);
+ const K=[['Capitale gestito',2.4,1,' mld','€ '],['Clienti attivi',120000,0,'',''],['Soddisfazione',98.7,1,' %','']];
+ K.forEach((k,i)=>{const X=120+i*360,a=oQ(p(t,.3+i*.15,1.0+i*.15));x.save();x.globalAlpha=a;x.translate(0,20*(1-a));card(X,220,320,300);
+  const v=k[1]*oQ(p(t,.5+i*.15,2.2+i*.15));T(k[0],X+32,270,'500 20px I',MUT);T(k[4]+eur(v,k[2])+k[3],X+32,340,'700 50px I',INK);
+  const s=series(20,i+3,0,1,3);const mn=Math.min(...s),mx=Math.max(...s);line(s.map((v,j)=>[X+32+j*(256/19),470-(v-mn)/(mx-mn)*70]),oC(p(t,.8+i*.15,2.4)),ACC,3);x.restore()});}],
+['Grafico con cursore',true,t=>{bg(NAVY);const s=series(60,7,100,.55,4);const mn=Math.min(...s),mx=Math.max(...s);const X0=120,X1=1160,Y0=560,Y1=200;
+ const P=s.map((v,i)=>[X0+i*(X1-X0)/59,Y0-(v-mn)/(mx-mn)*(Y0-Y1)]);x.save();x.strokeStyle='rgba(255,255,255,.08)';for(let j=0;j<5;j++){const y=Y1+j*(Y0-Y1)/4;x.beginPath();x.moveTo(X0,y);x.lineTo(X1,y);x.stroke()}x.restore();
+ const pr=ioC(p(t,.2,2.6));const k=Math.floor(pr*59);x.save();x.beginPath();x.moveTo(X0,Y0);for(let i=0;i<=k;i++)x.lineTo(...P[i]);x.lineTo(P[k][0],Y0);x.closePath();const g=x.createLinearGradient(0,Y1,0,Y0);g.addColorStop(0,'rgba(25,194,160,.35)');g.addColorStop(1,'rgba(25,194,160,0)');x.fillStyle=g;x.fill();x.restore();line(P,pr,ACC,3);
+ const c=P[k];x.save();x.strokeStyle='rgba(255,255,255,.25)';x.setLineDash([4,6]);x.beginPath();x.moveTo(c[0],Y1-20);x.lineTo(c[0],Y0);x.stroke();x.restore();x.fillStyle='#fff';x.beginPath();x.arc(c[0],c[1],7,0,TAU);x.fill();
+ const val=s[k];card(Math.min(c[0]+16,X1-190),c[1]-80,180,62,'#fff',.3,10);T('€ '+eur(val,2),Math.min(c[0]+16,X1-190)+18,c[1]-49,'700 24px I',INK);
+ up('Valore del fondo',X0,120,'600 36px I','#fff',t,0);T('+'+eur((val/s[0]-1)*100,1)+' %',X0,165,'600 22px I',ACC,'left',p(t,.3,.8));}],
+['Carta con riflesso',false,t=>{bg('#E9EDF2');const a=oQ(p(t,.1,1.4)),ry=lerp(.9,-.12,a);const cw=520,ch=330,sx=Math.cos(ry);
+ x.save();x.translate(W/2,H/2+10);x.fillStyle='rgba(11,31,58,.18)';x.filter='blur(24px)';x.beginPath();x.ellipse(0,200,cw*sx*.45+40,22,0,0,TAU);x.fill();x.filter='none';
+ x.transform(sx,Math.sin(ry)*.18,0,1,0,0);const g=x.createLinearGradient(-cw/2,-ch/2,cw/2,ch/2);g.addColorStop(0,'#0B1F3A');g.addColorStop(1,'#1E4C7A');rr(-cw/2,-ch/2,cw,ch,24);x.fillStyle=g;x.fill();
+ x.save();x.clip();const sw=lerp(-cw,cw,p(t,1.4,2.4));const sh=x.createLinearGradient(sw-120,0,sw+120,0);sh.addColorStop(0,'rgba(255,255,255,0)');sh.addColorStop(.5,'rgba(255,255,255,.28)');sh.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=sh;x.fillRect(-cw,-ch,cw*2,ch*2);x.restore();
+ rr(-cw/2+40,-60,62,46,8);x.fillStyle=GOLD;x.fill();T('BELUGA',-cw/2+40,-ch/2+50,'700 26px I','#fff');T('••••  ••••  ••••  4821',-cw/2+40,60,'500 28px I','rgba(255,255,255,.9)');T('F. ROSSI',-cw/2+40,120,'500 18px I','rgba(255,255,255,.7)');x.restore();
+ up('Una carta, zero commissioni.',W/2,90,'600 40px I',INK,t,1.8,'center');}],
+['App e notifica',true,t=>{bg(NAVY);const a=oQ(p(t,0,.9));const PX=W/2-170,PY=lerp(760,70,a);
+ x.save();rr(PX,PY,340,690,46);x.fillStyle='#05101F';x.fill();rr(PX+12,PY+12,316,666,36);x.fillStyle='#fff';x.fill();x.save();x.clip();
+ T('Saldo disponibile',PX+36,PY+90,'500 16px I',MUT);T('€ '+eur(12480.5*oQ(p(t,.6,1.8)),2),PX+36,PY+130,'700 36px I',INK);
+ [['Affitto Via Roma','-€ 950,00'],['Stipendio','+€ 2.400,00'],['Supermercato','-€ 64,20'],['Rata mutuo','-€ 610,00']].forEach((r,i)=>{const k=oQ(p(t,1+i*.12,1.6+i*.12));x.save();x.globalAlpha=k;x.translate(30*(1-k),0);const y=PY+200+i*76;rr(PX+28,y,284,62,12);x.fillStyle=LIGHT;x.fill();T(r[0],PX+46,y+31,'500 16px I',INK);T(r[1],PX+296,y+31,'600 16px I',r[1][0]=='+'?ACC:INK,'right');x.restore()});x.restore();x.restore();
+ const n=oQ(p(t,2.2,2.8));if(n>0){x.save();x.globalAlpha=n;x.translate(0,-30*(1-n));card(W/2-230,40,460,84,'#fff',.35,18);x.fillStyle=ACC;x.beginPath();x.arc(W/2-186,82,18,0,TAU);x.fill();T('Pagamento ricevuto',W/2-152,70,'600 18px I',INK);T('+€ 1.250,00 da Studio Bianchi',W/2-152,96,'500 15px I',MUT);x.restore()}}],
+['Mappa immobili',false,t=>{bg('#EEF1F5');x.save();x.strokeStyle='#fff';const r=rng(2);for(let i=0;i<14;i++){x.lineWidth=6+r()*10;x.beginPath();const y=r()*H;x.moveTo(0,y);x.lineTo(W,y+(r()-.5)*200);x.stroke();x.beginPath();const xx=r()*W;x.moveTo(xx,0);x.lineTo(xx+(r()-.5)*200,H);x.stroke()}x.fillStyle='rgba(25,194,160,.12)';x.beginPath();x.ellipse(900,250,180,120,.3,0,TAU);x.fill();x.restore();
+ const pins=[[300,300,'€ 320k'],[520,460,'€ 285k'],[760,220,'€ 410k'],[980,420,'€ 365k'],[640,560,'€ 299k']];
+ pins.forEach((q,i)=>{const k=oQ(p(t,.2+i*.12,.8+i*.12));if(k<=0)return;const hl=i==2&&t>1.6;x.save();x.translate(q[0],q[1]-30*(1-k));x.globalAlpha=k;rr(-52,-58,104,38,19);x.fillStyle=hl?NAVY:'#fff';x.shadowColor='rgba(11,31,58,.2)';x.shadowBlur=14;x.fill();x.shadowColor='transparent';T(q[2],0,-39,'600 17px I',hl?'#fff':INK,'center');x.beginPath();x.moveTo(-8,-21);x.lineTo(0,-10);x.lineTo(8,-21);x.fill();x.restore()});
+ const c=oQ(p(t,1.8,2.5));if(c>0){x.save();x.globalAlpha=c;x.translate(30*(1-c),0);card(840,250,330,250,'#fff',.2);x.fillStyle='#CBD5E1';rr(856,266,298,110,10);x.fill();T('Trilocale, Porta Romana',860,410,'600 19px I',INK);T('85 m² · 2 bagni · classe A',860,440,'500 15px I',MUT);T('Rendimento stimato 5,8 %',860,474,'600 15px I',ACC);x.restore()}}],
+['Edificio in wireframe',true,t=>{bg(NAVY);const iso=(a,b,c)=>[W/2-60+(a-b)*Math.cos(Math.PI/6)*1.0,470+(a+b)*Math.sin(Math.PI/6)*1.0-c];const w=200,d=160,fh=48,F=6;
+ x.save();x.strokeStyle='rgba(255,255,255,.75)';x.lineWidth=1.5;const pr=oC(p(t,.1,1.8));for(let f=0;f<=F;f++){const z=f*fh;if(f/F>pr)break;const q=[iso(0,0,z),iso(w,0,z),iso(w,d,z),iso(0,d,z)];x.beginPath();q.forEach((v,i)=>i?x.lineTo(...v):x.moveTo(...v));x.closePath();x.stroke()}
+ [[0,0],[w,0],[w,d],[0,d]].forEach(([a,b])=>{const A=iso(a,b,0),B=iso(a,b,F*fh*pr);x.beginPath();x.moveTo(...A);x.lineTo(...B);x.stroke()});x.restore();
+ const hf=Math.floor(p(t,2.0,3.0)*4);for(let f=0;f<hf;f++){const z=(f+1)*fh;const q=[iso(0,0,z),iso(w,0,z),iso(w,0,z+fh),iso(0,0,z+fh)];x.save();x.fillStyle='rgba(25,194,160,.35)';x.beginPath();q.forEach((v,i)=>i?x.lineTo(...v):x.moveTo(...v));x.closePath();x.fill();x.restore()}
+ up('Rendimento netto',820,300,'500 22px I','rgba(255,255,255,.7)',t,1.6);up('6,2 %',820,360,'700 72px I','#fff',t,1.8);up('4 piani su 6 già locati',820,430,'300 22px I','rgba(255,255,255,.75)',t,2.2);}],
+['Sicurezza dei dati',false,t=>{bg(LIGHT);const a=oQ(p(t,.1,.9));x.save();x.translate(W/2-260,H/2);x.scale(a,a);x.beginPath();x.moveTo(0,-130);x.bezierCurveTo(70,-100,110,-100,120,-96);x.lineTo(120,0);x.bezierCurveTo(110,80,50,120,0,140);x.bezierCurveTo(-50,120,-110,80,-120,0);x.lineTo(-120,-96);x.bezierCurveTo(-110,-100,-70,-100,0,-130);x.fillStyle=NAVY;x.fill();
+ const c=oC(p(t,.8,1.4));x.strokeStyle=ACC;x.lineWidth=14;x.lineCap='round';x.lineJoin='round';x.setLineDash([200,200]);x.lineDashOffset=200*(1-c);x.beginPath();x.moveTo(-48,4);x.lineTo(-12,40);x.lineTo(54,-34);x.stroke();x.restore();
+ up('I tuoi dati, protetti.',W/2-60,250,'600 52px I',INK,t,.6);['Crittografia end-to-end','Autenticazione a due fattori','Server in Europa'].forEach((s,i)=>{const y=340+i*62;const k=oQ(p(t,1.2+i*.2,1.8+i*.2));x.save();x.globalAlpha=k;x.fillStyle=ACC;x.beginPath();x.arc(W/2-44,y,10,0,TAU);x.fill();x.restore();up(s,W/2-20,y,'500 26px I',INK,t,1.2+i*.2)});}],
+['Allocazione portafoglio',true,t=>{bg(NAVY);const seg=[['Immobili',.38,ACC],['Azioni',.27,'#4C8DFF'],['Obbligazioni',.22,GOLD],['Liquidità',.13,'#8FA3BF']];let a0=-Math.PI/2;const pr=ioC(p(t,.2,2.0));let acc=0;
+ seg.forEach(([n,v,c],i)=>{const s=cl((pr-acc)/v);acc+=v;if(s<=0){a0+=v*TAU;return}x.save();x.strokeStyle=c;x.lineWidth=46;x.beginPath();x.arc(420,H/2,170,a0+.012,a0+v*TAU*s-.012);x.stroke();x.restore();a0+=v*TAU;
+  const y=230+i*80;up(n,760,y,'500 26px I','#fff',t,.6+i*.25);up(eur(v*100,0)+' %',1110,y,'700 26px I',c,t,.6+i*.25,'right');x.save();x.globalAlpha=oQ(p(t,.6+i*.25,1.2+i*.25));x.fillStyle=c;x.fillRect(730,y-9,14,18);x.restore()});
+ T('Profilo',420,H/2-22,'500 20px I','rgba(255,255,255,.6)','center',p(t,1.6,2.2));T('Bilanciato',420,H/2+14,'700 30px I','#fff','center',p(t,1.6,2.2));}],
+['Confronto costi',false,t=>{bg(LIGHT);up('Costo annuo su € 100.000 investiti',120,130,'600 38px I',INK,t,0);
+ const R=[['Banca tradizionale',2100,'#AEB8C6'],['Consulente privato',1500,'#AEB8C6'],['BELUGA',450,ACC]];R.forEach(([n,v,c],i)=>{const y=260+i*120,k=oQ(p(t,.5+i*.25,1.8+i*.25));up(n,120,y-34,'500 22px I',INK,t,.4+i*.25);x.fillStyle=c;rr(120,y-10,Math.max(1,(v/2100)*860*k),44,8);x.fill();T('€ '+eur(Math.round(v*k)),130+(v/2100)*860*k+16,y+12,'700 24px I',i==2?ACC:INK,'left',p(t,.6+i*.25,1+i*.25))});
+ up('Risparmi fino a € 1.650 l’anno.',120,640,'600 26px I',INK,t,2.4);}],
+['Processo in tre passi',true,t=>{bg(NAVY);const P=[['01','Richiedi','in 3 minuti online'],['02','Verifica','identità e documenti'],['03','Ricevi','fondi in 24 ore']];const xs=[250,640,1030],y=330;
+ x.save();x.strokeStyle='rgba(255,255,255,.15)';x.lineWidth=3;x.beginPath();x.moveTo(xs[0],y);x.lineTo(xs[2],y);x.stroke();x.strokeStyle=ACC;x.beginPath();x.moveTo(xs[0],y);x.lineTo(lerp(xs[0],xs[2],ioC(p(t,.6,2.6))),y);x.stroke();x.restore();
+ P.forEach((q,i)=>{const on=t>.5+i*1.0;const k=oQ(p(t,.3+i*.15,.9+i*.15));x.save();x.globalAlpha=k;x.fillStyle=on?ACC:NAVY2;x.beginPath();x.arc(xs[i],y,46,0,TAU);x.fill();x.strokeStyle=on?ACC:'rgba(255,255,255,.3)';x.lineWidth=2;x.stroke();x.restore();T(q[0],xs[i],y,'700 24px I',on?NAVY:'#fff','center',k);up(q[1],xs[i],y+100,'600 32px I','#fff',t,.5+i*.2,'center');up(q[2],xs[i],y+145,'300 21px I','rgba(255,255,255,.7)',t,.6+i*.2,'center')});
+ up('Come funziona',W/2,130,'600 22px I','rgba(255,255,255,.6)',t,0,'center');}],
+['Chiusura con logo',false,t=>{bg('#FFFFFF');const a=oQ(p(t,.1,1.0));x.save();x.translate(W/2,290);for(let i=0;i<3;i++){const k=oQ(p(t,.1+i*.15,.9+i*.15));x.fillStyle=[NAVY,'#1E4C7A',ACC][i];x.globalAlpha=k;rr(-60+i*44,40-(i+1)*34*k,32,(i+1)*34*k,4);x.fill()}x.restore();
+ up('BELUGA CAPITAL',W/2,380,'700 44px I',INK,t,.7,'center');up('Investire, con chiarezza.',W/2,440,'300 26px I',MUT,t,1.0,'center');up('beluga.it',W/2,510,'600 20px I',ACC,t,1.3,'center');
+ T('Il valore degli investimenti può diminuire. I rendimenti passati non sono indicativi di quelli futuri. Messaggio pubblicitario.',W/2,640,'500 13px I','rgba(11,31,58,.5)','center',p(t,1.6,2.2));}],
+];
+window.TOTAL=S.length*D;window.D=D;window.N=S.length;
+window.drawFrame=t=>{const i=Math.min(S.length-1,Math.floor(t/D)),lt=t-i*D;x.save();S[i][2](lt);x.restore();label(i+1,S[i][0],S[i][1]);};
+</script></body></html>
