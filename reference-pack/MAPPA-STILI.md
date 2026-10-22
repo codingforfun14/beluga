@@ -8,7 +8,7 @@ Legenda asset: **C** = codice (HyperFrames), **KI** = immagine Kling animata in 
 
 | N. | Stile | Quando (parole del brief) | Firma visiva | Movimento | Asset | Riferimenti da studiare | Stato |
 |---|---|---|---|---|---|---|---|
-| 01 | Kinetic typography | lancio, manifesto, citazione, lyric video | 1 font display + 1 testo, 2 colori, testo enorme a tutto schermo | parole a ritmo del beat, tagli ogni 0,3-0,6 s, letter spacing animato | C | titoli di Saul Bass, lyric video, Apple keynote | da fare |
+| 01 | Kinetic typography | lancio, manifesto, citazione, lyric video | 1 font display + 1 testo, 2 colori, testo enorme a tutto schermo | parole a ritmo del beat, tagli ogni 0,3-0,6 s, letter spacing animato | C | titoli di Saul Bass, lyric video, Apple keynote | [scheda](categorie/01-kinetic-typography/SCHEDA.md) |
 | 02 | Explainer flat vettoriale | spiegare un concetto, app, scienza | forme piatte, 4-5 colori pastello saturi, contorni assenti, ombre a 1 tono | ogni idea 3-5 s, transizioni per trasformazione delle forme | C | Kurzgesagt, BUCK | [scheda](categorie/02-explainer-flat/SCHEDA.md) |
 | 03 | 3D morbido e clay | tech amichevole, prodotto, giocoso premium | materiali opachi tipo argilla, luce morbida da studio, colori pastello | rimbalzi elastici (smorzamento 0,6-0,8), camera lenta | KI / KV | spot tech, Apple | da fare |
 | 04 | Vetro, gradienti, SaaS | software, startup, lancio funzione | sfondo scuro, gradienti mesh, vetro smerigliato, UI pulita | parallasse lenta, glow, reveal con maschere, ease expo.out | C | lanci prodotto Stripe e Linear | da fare |
