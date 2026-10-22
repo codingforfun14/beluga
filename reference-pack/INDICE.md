@@ -16,6 +16,7 @@ Le altre 17 categorie del piano arrivano una per sessione.
 - [Formati e safe zone](manuale/formati-e-safe-zone.md): 9:16, 4:5, 1:1, 16:9, testo e sottotitoli.
 - [Suono](manuale/sound-design.md): livelli e sincronia.
 - [Checklist prima della consegna](manuale/checklist-qualita.md).
+- [Metodo HyperFrames](manuale/metodo-hyperframes.md): installazione, ciclo di lavoro, cosa rende un clip professionale, quando servono immagini o video Kling.
 - [Skill e strumenti da installare](skill/DA-INSTALLARE.md).
 
 ## Colonne di ogni reference.csv
