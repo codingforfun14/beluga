@@ -6,6 +6,12 @@ Si parte da qui per ogni nuova idea. Si scelgono 1-3 categorie, si apre la loro 
 
 Prima di scegliere una categoria si segue il [metodo di direzione creativa](direzione-creativa/METODO.md): brief, insight, tre territori, direzione artistica, storyboard, review. Modelli pronti in `direzione-creativa/modelli/`.
 
+## Focus attuale (priorità di fede)
+| Quando il brief dice | Apri | Cosa c'è |
+|---|---|---|
+| 3D, prodotto premium, brand film, ident, simulazione | [Motion design 3D](focus/3d-motion/SCHEDA.md) | scheda, 16 reference |
+| spot, campagna, TV, YouTube, social a pagamento | [Spot pubblicitari](focus/spot/SCHEDA.md) | scheda, 18 reference, regole di efficacia |
+
 ## Categorie di stile
 
 | Se il brief dice... | Categoria | Stato |
