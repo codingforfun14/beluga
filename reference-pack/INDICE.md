@@ -15,6 +15,7 @@ Prima di scegliere una categoria si segue il [metodo di direzione creativa](dire
 | fatto a mano, appunti, lavagna, tono umano | [05 Disegnato a mano](categorie/05-disegnato-a-mano/SCHEDA.md) | scheda, 6 reference, 12 clip 16:9 |
 | spiegare come funziona, app o servizio nuovo, scienza, formazione | [02 Explainer flat](categorie/02-explainer-flat/SCHEDA.md) | scheda, 5 reference |
 | app, software, funzione nuova, lancio SaaS, walkthrough | [09 Demo UI e prodotto](categorie/09-demo-ui-prodotto/SCHEDA.md) | scheda, 3 reference |
+| "perché succede", storia, documentario, giornalismo | [06 Collage e carta](categorie/06-collage-carta/SCHEDA.md) | scheda, 7 reference, skill vox-explainer |
 | mascotte, personaggio, serie con lo stesso protagonista, spot con dialogo | [Mascotte con Kling](categorie/mascotte-kling/SCHEDA.md) | scheda, 5 reference, prompt base, test spot in `test-hyperframes/clip3-spot` |
 
 Tutti i 20 stili, con firma visiva e quando usarli, sono nella [mappa degli stili](MAPPA-STILI.md). Le schede mancanti arrivano una per sessione.
