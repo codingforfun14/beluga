@@ -50,4 +50,4 @@ Musica corporate calma (pianoforte e archi leggeri o elettronica pulita, 90-110 
 `node ../../tools/render.mjs categoria11.html out.mp4 30 [config.json] [--scene N]`. Per il verticale e per i nuovi progetti conviene rifare la tecnica in HyperFrames ([metodo](../../manuale/metodo-hyperframes.md)).
 
 ## Limiti di questa scheda
-Mancano ancora le reference esterne (`reference.csv`) e le clip in 9:16. I numeri nelle clip sono esempi, non dati reali.
+Le reference esterne sono poche (vedi `reference.csv`) e vanno ampliate; mancano le clip in 9:16. I numeri nelle clip sono esempi, non dati reali.

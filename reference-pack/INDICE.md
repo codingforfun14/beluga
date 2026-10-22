@@ -11,8 +11,8 @@ Prima di scegliere una categoria si segue il [metodo di direzione creativa](dire
 | Se il brief dice... | Categoria | Stato |
 | --- | --- | --- |
 | reel, TikTok, Shorts, "deve fermare lo scroll", lancio social | [16 Hook per short](categorie/16-hook-per-short/SCHEDA.md) | completa: scheda, 29 reference, 12 clip 9:16 con parametri |
-| finanza, banca, investimenti, tono serio e affidabile | [11 Corporate finanza](categorie/11-corporate-finanza/SCHEDA.md) | scheda, 12 clip 16:9, 61 stock con licenza |
-| fatto a mano, appunti, lavagna, tono umano | [05 Disegnato a mano](categorie/05-disegnato-a-mano/SCHEDA.md) | scheda, 12 clip 16:9 |
+| finanza, banca, investimenti, tono serio e affidabile | [11 Corporate finanza](categorie/11-corporate-finanza/SCHEDA.md) | scheda, 4 reference, 12 clip 16:9, 61 stock con licenza |
+| fatto a mano, appunti, lavagna, tono umano | [05 Disegnato a mano](categorie/05-disegnato-a-mano/SCHEDA.md) | scheda, 6 reference, 12 clip 16:9 |
 | mascotte, personaggio, serie con lo stesso protagonista, spot con dialogo | [Mascotte con Kling](categorie/mascotte-kling/SCHEDA.md) | scheda, 5 reference, prompt base, test spot in `test-hyperframes/clip3-spot` |
 
 Tutti i 20 stili, con firma visiva e quando usarli, sono nella [mappa degli stili](MAPPA-STILI.md). Le schede mancanti arrivano una per sessione.

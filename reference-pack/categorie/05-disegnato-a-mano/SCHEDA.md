@@ -48,4 +48,4 @@ Matita o pennarello su carta mentre il tratto si disegna, piccoli pop quando com
 `node ../../tools/render.mjs categoria05.html out.mp4 30 [config.json] [--scene N]`. Per il verticale e per i nuovi progetti conviene rifare la tecnica in HyperFrames ([metodo](../../manuale/metodo-hyperframes.md)).
 
 ## Limiti di questa scheda
-Mancano ancora le reference esterne (`reference.csv`) e le clip in 9:16.
+Le reference esterne sono poche (vedi `reference.csv`) e vanno ampliate; mancano le clip in 9:16.
