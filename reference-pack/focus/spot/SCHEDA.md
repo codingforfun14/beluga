@@ -8,6 +8,8 @@ Fonti: Cannes Lions 2025, Ciclope 2025, Motion Awards 2025 (vedi [reference.csv]
 - **Emozione e mestiere contro la patina digitale.** Telstra "Better on a Better Network" (Grand Prix Film Craft Cannes 2025): plastilina in stop-motion, 56 pupazzi doppiati da 42 australiani di provincia, 26 spot, uno per ogni paese. La giuria: "tattile, intimo, profondamente umano", "un pasto cotto lentamente" nell'epoca dei contenuti veloci, distinto dalla "patina AI e digitale".
 - **Un'idea che cambia il modo di vedere una cosa.** Channel 4 "Considering What?" (Grand Prix Film): gravità, attrito e tempo diventano personaggi animati che disturbano sette atleti paralimpici. Risultato: le Paralimpiadi più viste nel Regno Unito dal 2012, e il 79% degli spettatori le ha trovate emozionanti quanto le Olimpiadi.
 - **Il brand che ritrova la sua voce.** L'Oréal "The Final Copy of Ilon Specht" (Grand Prix Film): 17 minuti di documentario sulla copywriter che nel 1973 scrisse "Perché io valgo".
+- **2024-2026, la stessa direzione.** Coinbase "Your Way Out" (Grand Prix Film Craft Cannes 2026, 2 Black Pencil D&AD 2026) sembra un videogioco in 3D ma è tutto costruito dal vero: due set da 80 metri, miniature, nessun effetto digitale, con la regola "no AI" fin dall'inizio. HORNBACH vince tre anni di fila con umorismo e set fisici ("The Square Meter", Grand Prix Film Craft 2024). Lezione: quando tutti possono generare tutto, vince ciò che si vede che è stato fatto davvero, e l'umorismo (Grand Prix Film 2026: la campagna Claude di Mother London, "corporate aikido").
+- **La rivelazione che ribalta.** Orange "Women's Football" (Grand Prix Film 2024): le azioni migliori della nazionale maschile erano delle calciatrici, con i volti cambiati in VFX. Lo spettatore rivede tutto in testa.
 - Kate Stanners, presidente di giuria: "Il film ha un potere irragionevole di suscitare emozione. Usato al meglio non vive su un clic, vive nella tua testa."
 
 ## 2. Cosa fa funzionare uno spot (dati)
@@ -60,6 +62,8 @@ Da **HF** `story.md`: incrociare un espediente con una forma.
 | Un numero che atterra | un numero vero guadagnato da una scena e reso fisico |
 | L'oggetto è la spiegazione | una macchina o un modello il cui funzionamento è l'idea |
 | Personificare l'astratto | (Channel 4) forze invisibili diventano personaggi |
+| La rivelazione finale | (Orange) l'ultimo secondo cambia il senso di tutto lo spot |
+| Il mondo in scala | (HORNBACH) un set costruito che porta l'idea all'estremo (stanze da un metro quadro) |
 
 | Forma | Cosa vede lo spettatore |
 |---|---|

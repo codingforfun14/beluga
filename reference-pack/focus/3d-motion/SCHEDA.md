@@ -11,6 +11,10 @@ I 3D premiati non sono "belli", hanno un'idea fisica:
 - **ManvsMachine, Nike Air Max**: macchine cinetiche 3D, minimalismo industriale e movimento coreografato, montato stretto sulla musica; ogni film ha la sua palette.
 - **Aardman, Nest** (2025): CG che imita la plastilina per rendere calde le pensioni.
 
+- **Studio River, Hublot "R.EVISITED"** (2026): uno spot inventato (spec) come biglietto da visita; un orologio sotto il ghiaccio, bianco e nero, immobilità tenuta a lungo, simulazione Houdini.
+- **Kutuko, Bullpadel** (2026): si vedono i danni dopo la partita (vetro rotto, cratere), non l'impatto. Il prodotto domina dal primo fotogramma, il ritmo cresce.
+- **Attenzione:** il "3D" più premiato del 2026 (Coinbase "Your Way Out") non è CG: è costruito in camera. Il look digitale fatto a mano batte il CG perfetto; nel nostro caso vuol dire imperfezioni, materiali veri, Kling usato per sembrare fisico, non lucido.
+
 Domanda da farsi: quale materiale, fenomeno fisico o meccanismo **è** il messaggio? Se la risposta è "nessuno", il 3D è decorazione.
 
 ## 2. Camera

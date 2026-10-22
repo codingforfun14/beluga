@@ -9,8 +9,8 @@ Prima di scegliere una categoria si segue il [metodo di direzione creativa](dire
 ## Focus attuale (priorità di fede)
 | Quando il brief dice | Apri | Cosa c'è |
 |---|---|---|
-| 3D, prodotto premium, brand film, ident, simulazione | [Motion design 3D](focus/3d-motion/SCHEDA.md) | scheda, 16 reference |
-| spot, campagna, TV, YouTube, social a pagamento | [Spot pubblicitari](focus/spot/SCHEDA.md) | scheda, 18 reference, regole di efficacia |
+| 3D, prodotto premium, brand film, ident, simulazione | [Motion design 3D](focus/3d-motion/SCHEDA.md) | scheda, 24 reference, catalogo skill |
+| spot, campagna, TV, YouTube, social a pagamento | [Spot pubblicitari](focus/spot/SCHEDA.md) | scheda, 35 reference, regole di efficacia, catalogo skill |
 
 ## Categorie di stile
 
