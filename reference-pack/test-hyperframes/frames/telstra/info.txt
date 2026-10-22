@@ -1,0 +1,6 @@
+source: https://player.vimeo.com/video/1094089817
+width=1920
+height=1080
+r_frame_rate=25/1
+duration=415.040000
+scene_frames: 40 (of 43 detected at threshold 0.3; evenly subsampled when over 40)
