@@ -60,10 +60,10 @@ m_grey = mat('binder_grey', (0.11, 0.115, 0.12), 0.55)
 m_grey2 = mat('binder_grey2', (0.05, 0.05, 0.055), 0.5)
 m_blue = mat('binder_blue', (0.008, 0.02, 0.07), 0.45)
 m_ink = mat('ink', (0.05, 0.05, 0.05), 0.6)
-m_red = mat('stamp', (0.45, 0.02, 0.02), 0.7)
+m_red = mat('stamp', (0.62, 0.025, 0.02), 0.6)
 m_metal = mat('clip', (0.8, 0.8, 0.82), 0.25); m_metal.node_tree.nodes['Principled BSDF'].inputs['Metallic'].default_value = 1
 m_pit = mat('pit', (0, 0, 0), 1.0)
-m_card = mat('card', srgb('#F3F0E9'), 0.45, emit=srgb('#FFF6EA'), estr=0.0)
+m_card = mat('card', srgb('#161618'), 0.35, emit=srgb('#FFF6EA'), estr=0.0)
 m_edge = mat('card_edge', ORANGE, 0.4, emit=ORANGE, estr=0.0)
 
 # ---------------------------------------------------------------- mondo: nero con un filo di ambiente per i riflessi
@@ -115,50 +115,72 @@ def mesh_obj(name, bm, mats):
 
 # ---------------------------------------------------------------- monolite: risme, raccoglitori, fogli sfusi (un'unica mesh)
 MW, MD, MH = 1.6, 1.2, 3.0
-mats_mono = [m_paper, m_paper_e, m_grey, m_grey2, m_blue]
+m_strap = mat('elastico', (0.012, 0.012, 0.012), 0.6)
+mats_mono = [m_paper, m_paper_e, m_grey, m_grey2, m_blue, m_strap]
+NOTE_Z = 1.55
 bm = bmesh.new(); z = 0.0; items = []   # items: (centro locale, size, rotz, tipo) -> riusati come detriti
+def tilted_sheet(c, rz, tx, ty, size=(0.297, 0.21, 0.003)):
+    fs = box_into(bm, Vector(), size, 0, 0)
+    vs = list({v for f in fs for v in f.verts})
+    M = Matrix.Translation(c) @ Euler((tx, ty, rz)).to_matrix().to_4x4()
+    bmesh.ops.transform(bm, matrix=M, verts=vs)
 while z < MH - 0.04:
-    kind = random.choices(['ream', 'binder', 'loose'], [0.45, 0.4, 0.15])[0]
+    kind = random.choices(['ream', 'binder', 'loose'], [0.4, 0.42, 0.18])[0]
     h = {'ream': 0.052, 'binder': 0.075, 'loose': 0.03}[kind] * random.uniform(0.9, 1.15)
     nx, ny = 4, 3
+    lshift = Vector((random.uniform(-.03, .03), random.uniform(-.03, .03), 0))
     for i in range(nx):
         for j in range(ny):
-            cx = (i + 0.5) / nx * MW - MW / 2 + random.uniform(-.015, .015)
-            cy = (j + 0.5) / ny * MD - MD / 2 + random.uniform(-.015, .015)
-            rz = random.uniform(-0.06, 0.06)
-            c = Vector((cx, cy, z + h / 2))
+            cx = (i + 0.5) / nx * MW - MW / 2 + random.uniform(-.03, .03)
+            cy = (j + 0.5) / ny * MD - MD / 2 + random.uniform(-.03, .03)
+            rz = random.uniform(-0.1, 0.1)
+            c = Vector((cx, cy, z + h / 2)) + lshift
             if kind == 'binder':
                 mi = random.choices([2, 3, 4], [0.55, 0.35, 0.1])[0]
                 s = (MW / nx * 0.97, MD / ny * 0.97, h * 0.96)
                 box_into(bm, c, s, rz, mi)
+                # dorso con etichetta bianca e foro ad anello sulle facce esterne
+                for side, ok in [((1, 0), i == nx - 1), ((-1, 0), i == 0), ((0, 1), j == ny - 1), ((0, -1), j == 0)]:
+                    if not ok: continue
+                    wdt = s[1] if side[0] else s[0]
+                    off = Vector(((s[0] / 2 + 0.002) * side[0], (s[1] / 2 + 0.002) * side[1], 0.004))
+                    off.rotate(Euler((0, 0, rz)))
+                    lab = (0.004, wdt * 0.42, h * 0.5) if side[0] else (wdt * 0.42, 0.004, h * 0.5)
+                    box_into(bm, c + off, lab, rz, 0)
+                    ring = (0.005, 0.03, 0.03) if side[0] else (0.03, 0.005, 0.03)
+                    off2 = Vector(((s[0] / 2 + 0.003) * side[0] + 0.12 * side[1], (s[1] / 2 + 0.003) * side[1] + 0.12 * side[0], 0))
+                    off2.rotate(Euler((0, 0, rz))); box_into(bm, c + off2, ring, rz, 3)
             else:
-                s = (MW / nx * random.uniform(0.9, 0.99), MD / ny * random.uniform(0.9, 0.99), h * 0.97)
+                s = (MW / nx * random.uniform(0.88, 0.99), MD / ny * random.uniform(0.88, 0.99), h * 0.97)
                 box_into(bm, c, s, rz, 0, 1)
+            if random.random() < 0.22:   # cinghia elastica nera attorno al pacco
+                box_into(bm, c + Vector((random.uniform(-.08, .08), 0, 0)), (0.018, s[1] + 0.006, h + 0.006), rz, 5)
             items.append((c.copy(), s, rz, kind))
-    # qualche foglio che sporge dai bordi: silhouette meno perfetta
-    if random.random() < 0.5:
+    # fogli sporgenti e storti su ogni strato (non davanti al foglio URGENTE)
+    for _ in range(random.choice([1, 1, 2, 3])):
         a = random.choice([0, 1, 2, 3])
         dx, dy = [(MW / 2, 0), (-MW / 2, 0), (0, MD / 2), (0, -MD / 2)][a]
-        box_into(bm, Vector((dx * 1.04 + random.uniform(-.2, .2) * (dy != 0), dy * 1.06 + random.uniform(-.2, .2) * (dx != 0), z + h)),
-                 (0.30, 0.21, 0.004), random.uniform(-0.4, 0.4), 0)
+        if dy < 0 and abs(z - NOTE_Z) < 0.4: continue
+        pos = Vector((dx * 0.92 + random.uniform(-.5, .5) * MW * (dy != 0), dy * 0.92 + random.uniform(-.4, .4) * MD * (dx != 0), z + h))
+        pos += Vector((dx, dy, 0)).normalized() * random.uniform(0.02, 0.12)
+        tilted_sheet(pos, random.uniform(-0.6, 0.6), random.uniform(-0.25, 0.25), random.uniform(-0.25, 0.25))
     z += h
 mono = mesh_obj('monolite', bm, mats_mono)
 MH = z
 # il foglio "URGENTE" fissato sulla faccia frontale (y negativa), con graffetta
-NOTE_Z = 1.55
 note = bpy.data.objects.new('nota', None); link(note); note.parent = mono
 note.location = (0.18, -MD / 2 - 0.006, NOTE_Z); note.rotation_euler = (math.radians(90), math.radians(-4), 0)
 bpy.ops.mesh.primitive_plane_add(size=1); sh = bpy.context.object; sh.scale = (0.21, 0.297, 1)
 sh.data.materials.append(m_paper); sh.parent = note
-for k in range(9):  # righe di testo stampato
+for k in range(6):  # righe di testo stampato
     bpy.ops.mesh.primitive_plane_add(size=1, location=(-0.012 + random.uniform(-.005, .005), 0.07 - k * 0.018, 0.0008))
     o = bpy.context.object; o.scale = (random.uniform(0.11, 0.16), 0.0035, 1); o.data.materials.append(m_ink); o.parent = note
 txt = bpy.data.curves.new('urgente', 'FONT'); txt.body = 'URGENTE'; txt.align_x = 'CENTER'; txt.align_y = 'CENTER'
 try: txt.font = bpy.data.fonts.load('/System/Library/Fonts/HelveticaNeue.ttc')
 except Exception: pass
-txt.size = 0.036; txt.extrude = 0.0003
+txt.size = 0.04; txt.extrude = 0.0003
 to = bpy.data.objects.new('urgente', txt); link(to); to.data.materials.append(m_red); to.parent = note
-to.location = (0.0, -0.075, 0.0012); to.rotation_euler = (0, 0, math.radians(11))
+to.location = (0.0, -0.08, 0.0012); to.rotation_euler = (0, 0, math.radians(11))
 for (px, py, sx, sy) in [(0, 0.026, 0.19, 0.004), (0, -0.026, 0.19, 0.004), (0.095, 0, 0.004, 0.056), (-0.095, 0, 0.004, 0.056)]:
     bpy.ops.mesh.primitive_plane_add(size=1); o = bpy.context.object; o.scale = (sx, sy, 1)
     o.data.materials.append(m_red); o.parent = to; o.location = (px, py, 0.0002)
@@ -373,7 +395,7 @@ edge = mesh_obj('card_edge', rounded_rect(CW + 0.05, CH + 0.05, 0.085, 0.0), [m_
 back = mesh_obj('card_back', rounded_rect(CW + 0.05, CH + 0.05, 0.085, -0.004), [m_grey2]); back.parent = card
 # luce emessa dalla card
 cl_light = bpy.data.lights.new('card_light', 'AREA'); cl_light.size = 1.0; cl_light.color = (1, 0.95, 0.88)
-cll = bpy.data.objects.new('card_light', cl_light); link(cll); cll.parent = card; cll.location = (0, 0, 0.05)
+cll = bpy.data.objects.new('card_light', cl_light); link(cll); cll.parent = card; cll.location = (0, 0, 0.08); cll.rotation_euler = (math.pi, 0, 0)  # illumina davanti, non la card
 
 E0, E1 = F(8.5), F(12.0)
 CARD_C = Vector((0, 0, 1.35))
@@ -434,7 +456,7 @@ for f in range(ARRIVE + 15, END + 1, 15):  # galleggia appena
     card.keyframe_insert('location', frame=f); card.keyframe_insert('rotation_quaternion', frame=f)
 set_interp(card, lambda f: ('CUBIC', 'EASE_OUT') if f == E1 else None)
 for f, v in [(E0, 0), (E1 - 40, 0.15), (E1, 0.3), (ARRIVE, 0.22)]:
-    for m, mul_ in [(m_card, 1.0), (m_edge, 6.0)]:
+    for m, mul_ in [(m_card, 0.0), (m_edge, 5.0)]:
         s = m.node_tree.nodes['Principled BSDF'].inputs['Emission Strength']; s.default_value = v * mul_; s.keyframe_insert('default_value', frame=f)
     cl_light.energy = v * 900; cl_light.keyframe_insert('energy', frame=f)
 show_between(card, E0)
@@ -477,14 +499,19 @@ shots = []
 A, At = cam('A_rivela', (2.0, -7.0, 1.2), (0, 0, HANG + 1.45), 30, 5.6)
 key(A, 1, (2.2, -7.4, 1.1)); key(A, F(2.5), (1.7, -6.3, 1.3)); shots.append((1, A))
 B1, B1t = cam('B1_bordi', (1.2, -1.15, HANG + 0.5), (MW / 2, -MD / 2, 0.6), 85, 2.2)
-B1t.parent = mono; B1t.location = (MW / 2 - 0.05, -MD / 2, 0.55); B1t.matrix_parent_inverse = Matrix()
-key(B1, F(2.5) + 1, (1.25, -1.2, HANG + 0.45)); key(B1, F(3.5), (0.55, -1.3, HANG + NOTE_Z - 0.05))
-B1t.keyframe_insert('location', frame=F(2.5) + 1); B1t.location = (0.2, -MD / 2, NOTE_Z - 0.07); B1t.keyframe_insert('location', frame=F(3.5))
+B1t.parent = mono; B1t.location = (MW / 2 - 0.05, -MD / 2, 0.45); B1t.matrix_parent_inverse = Matrix()
+key(B1, F(2.5) + 1, (1.35, -1.3, HANG + 0.35)); key(B1, F(3.15), (1.15, -1.45, HANG + 0.95))
+B1t.keyframe_insert('location', frame=F(2.5) + 1); B1t.location = (MW / 2 - 0.1, -MD / 2, 1.05); B1t.keyframe_insert('location', frame=F(3.15))
 shots.append((F(2.5) + 1, B1))
+STAMP = Vector((0.18, -MD / 2, NOTE_Z - 0.075))
+Bs, Bst = cam('B1b_timbro', (0.3, -MD / 2 - 1.2, HANG + NOTE_Z - 0.1), STAMP, 85, 4.0)
+Bst.parent = mono; Bst.location = STAMP; Bst.matrix_parent_inverse = Matrix()
+key(Bs, F(3.15) + 1, (0.42, -MD / 2 - 1.25, HANG + NOTE_Z - 0.12)); key(Bs, F(3.8), (0.36, -MD / 2 - 1.0, HANG + NOTE_Z - 0.1))
+shots.append((F(3.15) + 1, Bs))
 B2, B2t = cam('B2_graffetta', (-0.1, -0.85, HANG + NOTE_Z + 0.25), (0.13, -MD / 2, NOTE_Z + 0.13), 100, 1.8)
 B2t.parent = mono; B2t.location = (0.12, -MD / 2, NOTE_Z + 0.12); B2t.matrix_parent_inverse = Matrix()
-key(B2, F(3.5) + 1, (-0.12, -1.08, HANG + NOTE_Z + 0.3)); key(B2, F(4.5), (0.0, -0.98, HANG + NOTE_Z + 0.22))
-shots.append((F(3.5) + 1, B2))
+key(B2, F(3.8) + 1, (-0.12, -1.08, HANG + NOTE_Z + 0.3)); key(B2, F(4.5), (0.0, -0.98, HANG + NOTE_Z + 0.22))
+shots.append((F(3.8) + 1, B2))
 C, Ct = cam('C_basso', (5.2, -6.2, 0.28), (0, 0, 1.25), 24)
 key(C, F(4.5) + 1, (5.4, -6.4, 0.28)); key(C, IMPACT, (5.1, -6.0, 0.26))
 for f, dz in [(IMPACT + 1, 0.09), (IMPACT + 2, -0.07), (IMPACT + 3, 0.05), (IMPACT + 4, -0.03), (IMPACT + 5, 0.015), (IMPACT + 6, 0)]:
