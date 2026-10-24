@@ -12,8 +12,21 @@ Il 60% degli spettatori guardava le Paralimpiadi per vedere atleti che "superano
 ## Espediente e forma
 **Personificare l'astratto** + montaggio serrato sul suono.
 
-## Beat
-Da misurare guardando lo spot (sessione Mac). Dichiarato: voce narrante di Nabil Shaban, attore disabile; citazioni vere degli spettatori nel film.
+## Beat (misurato sui fotogrammi, versione 140 s)
+Fonte: https://www.youtube.com/watch?v=bUs_mNTNwvE (canale Channel 4). Fotogrammi in `test-hyperframes/frames/channel4-considering-what/`.
+
+| Secondi | Cosa succede |
+|---|---|
+| 0-19 | apertura lenta, **nessun taglio per 19 s**: soggiorno buio, la Gravità (un uomo in poltrona) si prepara |
+| 19-35 | primi colpi: un'atleta in carrozzina abbattuta in campo, un uomo in auto che urla, la ciclista che sbanda |
+| 35-70 | **il montaggio esplode**: 39 tagli nel secondo quarto; Attrito e Gravità contro sprinter, ciclisti, nuotatori; il pubblico in tribuna |
+| 70-75 | entra il Tempo: un orologio a pendolo solo in una stanza buia |
+| 80-100 | gli spettatori a casa e alla fermata del bus guardano le gare in TV; le loro frasi vere |
+| 100-125 | climax: rugby in carrozzina, gli atleti vincono, la folla esplode |
+| 129 | cartello: "Heat doesn't care about disability" |
+| 136-140 | logo Channel 4 e Paris 2024 Paralympic Games |
+
+Ritmo: 89 tagli in 140 s, inquadratura media 1.6 s (misurato); 8 tagli nel primo quarto, 39 nel secondo. Dichiarato: voce narrante di Nabil Shaban, attore disabile.
 
 ## Suono
 Sound design, musica e voce fusi in un unico pezzo, "una sinfonia di tonfi, rotture e risate".

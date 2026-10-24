@@ -9,13 +9,20 @@ Un NPC, un personaggio di videogioco che ripete sempre la stessa routine, decide
 ## Espediente e forma
 Un personaggio rompe le regole del suo mondo + **viaggio da un mondo all'altro** (videogioco → realtà).
 
-## Beat (dichiarato, Adweek)
-1. L'NPC segue la sua routine.
-2. Decide di prendere il controllo.
-3. Fuga spettacolare.
-4. Arrivo in un mondo popolato da esseri umani veri.
+## Beat (misurato sui fotogrammi, versione 60 s)
+Fonte: https://www.youtube.com/watch?v=0V4CCxskN_0 (canale Coinbase). Fotogrammi in `test-hyperframes/frames/coinbase-your-way-out/`.
 
-Secondi da misurare guardando lo spot.
+| Secondi | Cosa succede |
+|---|---|
+| 0-12.6 | **routine dell'NPC**: strada in miniatura vista dall'alto come un videogioco, anelli gialli da "missione" sul marciapiede, poliziotti che marciano in gruppo; primo taglio solo a 12.6 s |
+| 12.6-23.5 | la fila infinita davanti a una banca "Trusted" ("Wait here"): tutti uguali con la valigetta |
+| 23.5-35 | l'NPC esce dal percorso: corre sul marciapiede, incrocio con le auto giocattolo |
+| 35-40 | 5 tagli ravvicinati: primo piano umano dietro un vetro, la mano sul vetro (la decisione) |
+| 40-52 | **fuga**: corsa per strade in miniatura, la camera scende e segue in mano |
+| 52-56 | **il cambio di mondo**: tre tagli in un secondo (52.2, 52.5, 53.7), da miniatura a live action vero; corsa su una collina al tramonto, il protagonista sorride |
+| 58-60 | logo Coinbase su blu |
+
+Ritmo: 10 tagli in 60 s, inquadratura media 5.5 s (misurato). Lento finché è "dentro il sistema", si accelera solo nella fuga.
 
 ## Mestiere
 Sembra CGI in pixel art, ma è quasi tutto costruito e girato: due set da 80 metri, miniature, location a Cape Town, look ottenuto in camera senza effetti digitali aggiunti; regola "no AI" dall'agenzia fin dall'inizio (dichiarato, CJC, testo promozionale della casa di produzione).

@@ -12,8 +12,21 @@ Le città si riempiono e le case si rimpiccioliscono: ogni metro quadro conta di
 ## Espediente e forma
 **Il mondo in scala portato all'estremo** + **un finto piano sequenza** che attraversa la casa (stanze collegate dal montaggio).
 
-## Beat (dichiarato)
-Doccia, colazione, annaffiare il giardino; scale altissime verso serre interne; una soffitta col tornio da vasaio; sala da pranzo; passaggio continuo da camera a bagno; finale che entra in un teatro.
+## Beat (misurato sui fotogrammi, versione 60 s)
+Fonte: https://www.youtube.com/watch?v=QmDckNBoKsY (copia LLLLITL; non trovata sul canale HORNBACH). Fotogrammi e `timeline.jpg` in `test-hyperframes/frames/hornbach-square-meter/`.
+
+| Secondi | Cosa succede |
+|---|---|
+| 0-3 | formato quadrato: un uomo suona la tuba in una stanza larga quanto lui |
+| 3-10 | sveglia nel letto, si veste: la camera sale in verticale dentro stanze da un metro quadro |
+| 10-13 | unici due tagli netti (10.4 e 13.1 s): la doccia nel vapore, il lavello visto dall'alto |
+| 13-30 | serra interna, scaffali, tornio da vasaio: un solo movimento continuo di camera che attraversa la casa |
+| 31-40 | cena di coppia in un metro quadro; la sala da pranzo vista dall'alto e capovolta |
+| 40-50 | ping pong, corridoio; a 43.5 s la casa intera in sezione come un alveare di stanze |
+| 52-58 | entra in un teatro pieno, di spalle sotto i riflettori; frase "Every square meter deserves to be the best in the world." |
+| 58-60 | logo HORNBACH sopra la scena |
+
+Ritmo: 2 tagli in 60 s (misurato): il film sembra un piano sequenza, con gli stacchi nascosti nei passaggi di stanza (dichiarato: stanze costruite separatamente e unite al montaggio).
 
 ## Mestiere
 - Stanze costruite separatamente e unite al montaggio in una casa sola.
