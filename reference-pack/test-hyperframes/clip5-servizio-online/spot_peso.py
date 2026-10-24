@@ -574,4 +574,5 @@ else:
     if len(argv) > 3:
         a, b = argv[3].split('-'); sc.frame_start, sc.frame_end = int(a), int(b)
     sc.render.filepath = out
+    sc.render.use_overwrite = False; sc.render.use_placeholder = True  # riprende senza rifare i fotogrammi esistenti
     bpy.ops.render.render(animation=True)
