@@ -4,7 +4,7 @@ Si parte da qui per ogni nuova idea. Si scelgono 1-3 categorie, si apre la loro 
 
 ## Da dove parte il creative director
 
-Prima di scegliere una categoria si segue il [metodo di direzione creativa](direzione-creativa/METODO.md): brief, insight, tre territori, direzione artistica, storyboard, review. Modelli pronti in `direzione-creativa/modelli/`.
+I [fondamenti](fondamenti/LEGGIMI.md) spiegano perché uno spot funziona (Binet e Field, Lemon, How Brands Grow, 12 principi). Prima di scegliere una categoria si segue il [metodo di direzione creativa](direzione-creativa/METODO.md): brief, insight, tre territori, direzione artistica, storyboard, review. Modelli pronti in `direzione-creativa/modelli/`.
 
 ## Focus attuale (priorità di fede)
 | Quando il brief dice | Apri | Cosa c'è |
