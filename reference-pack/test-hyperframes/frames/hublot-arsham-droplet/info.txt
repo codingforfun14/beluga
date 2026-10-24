@@ -7,3 +7,4 @@ scene_cuts: 99 (ffmpeg scene threshold 0.3)
 average_shot_length_s: 0.69
 scene_frames: 40 (first frame at 0.1 s + one frame 0.15 s after each cut; evenly subsampled when over 40)
 cut timestamps: cuts.txt; frame timestamps: frames_time.txt
+note: many cuts are flash/strobe transitions under 0.2 s, so average shot length understates real shot duration
