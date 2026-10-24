@@ -1,0 +1,12 @@
+scene_001 0.1
+scene_002 4.28
+scene_003 7.53
+scene_004 9.73
+scene_005 22.27
+scene_006 30.77
+scene_007 33.69
+scene_008 36.36
+scene_009 38.11
+scene_010 40.32
+scene_011 43.44
+scene_012 46.02

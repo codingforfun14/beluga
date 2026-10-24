@@ -1,0 +1,9 @@
+source: https://www.youtube.com/watch?v=d8MhdVxo9xc
+width=1920
+height=1080
+r_frame_rate=24000/1001
+duration=148.454000
+scene_cuts: 3 (ffmpeg scene threshold 0.3)
+average_shot_length_s: 37.11
+scene_frames: 4 (first frame at 0.1 s + one frame 0.15 s after each cut; evenly subsampled when over 40)
+cut timestamps: cuts.txt; frame timestamps: frames_time.txt

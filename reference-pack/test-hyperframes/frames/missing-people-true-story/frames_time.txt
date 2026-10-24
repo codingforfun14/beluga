@@ -1,0 +1,15 @@
+scene_001 0.1
+scene_002 16.07
+scene_003 23.71
+scene_004 26.95
+scene_005 91.51
+scene_006 106.59
+scene_007 119.35
+scene_008 120.63
+scene_009 121.75
+scene_010 123.15
+scene_011 125.31
+scene_012 127.31
+scene_013 151.31
+scene_014 153.15
+scene_015 193.51
