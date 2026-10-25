@@ -1,12 +1,15 @@
 # Spot "Sotto il telo" (Ferrari 488 GTB, test portfolio non ufficiale): scena animata completa, 30 s a 30 fps.
 # Costruisce la scena, calcola il telo (cloth) in cache su disco e salva un .blend da renderizzare a blocchi.
-# Uso: Blender -b --factory-startup -t 2 -P spot_garage.py -- <cartella_lavoro> <animatic|final>
+# Uso: Blender -b --factory-startup -t 2 -P spot_garage.py -- <cartella_lavoro> <animatic|final> [fino_secondi=30]
+#   solo la prima scena (0-6 s, fotogrammi 1-180):  ... -- ~/Desktop/DIGITALIZA/render-clip6/scena1 final 6
+#   poi: ./render_blocchi.sh ~/Desktop/DIGITALIZA/render-clip6/scena1/spot_garage.blend ~/Desktop/DIGITALIZA/render-clip6/scena1 1 180 30
 #   poi: ./render_blocchi.sh <cartella_lavoro>/spot_garage.blend <cartella_lavoro> 1 900 30
 # Modello: "Ferrari 488 gtb" di Turbostuart (Sketchfab, CC BY). Asset CC0: Poly Haven.
 import bpy, bmesh, sys, os, math, random
 from mathutils import Vector, Euler, Matrix, Quaternion
 argv = sys.argv[sys.argv.index('--') + 1:]
 WORK = os.path.abspath(argv[0]); MODE = argv[1] if len(argv) > 1 else 'animatic'
+FINO = float(argv[2]) if len(argv) > 2 else 30.0   # secondi da preparare: 6 = solo la prima scena (C1_saracinesca)
 HERE = os.path.dirname(os.path.abspath(__file__))
 ASSET = os.path.expanduser('~/Desktop/DIGITALIZA/render-clip6/asset')
 GLB = os.path.join(HERE, 'modello', 'ferrari_488_gtb.glb')
@@ -19,7 +22,7 @@ sc = bpy.context.scene
 FPS = 30
 sc.render.fps = FPS
 def F(t): return int(round(t * FPS)) + 1
-sc.frame_start, sc.frame_end = 1, F(30) - 1
+sc.frame_start, sc.frame_end = 1, F(FINO) - 1
 FINAL = MODE == 'final'
 
 # ------------------------------------------------------------------ materiali e utilita'
@@ -171,7 +174,7 @@ hk.matrix_inverse = Matrix.Translation(grab).inverted()
 cm = cloth.modifiers.new('cloth', 'CLOTH'); cm.settings.quality = 8; cm.settings.mass = 0.4
 cm.settings.tension_stiffness = 8; cm.settings.bending_stiffness = 0.6; cm.settings.vertex_group_mass = 'presa'
 cm.collision_settings.collision_quality = 3; cm.collision_settings.distance_min = 0.012
-cm.point_cache.frame_start, cm.point_cache.frame_end = 1, F(17)
+cm.point_cache.frame_start, cm.point_cache.frame_end = 1, min(F(17), sc.frame_end)   # con FINO=6 il telo si calcola solo fino a 180
 cloth.modifiers.new('sol', 'SOLIDIFY').thickness = 0.006
 cloth.modifiers.new('sub', 'SUBSURF').levels = 1
 for p in cloth.data.polygons: p.use_smooth = True
