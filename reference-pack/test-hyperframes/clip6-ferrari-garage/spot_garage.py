@@ -396,8 +396,9 @@ path(c1, t1, [(0, (1.9, -4.4, 0.6), (-0.9, 6, 0.9)), (6.0, (1.7, -3.9, 0.62), (-
 c2, t2 = cam('C2_POV_drone', 18)
 path(c2, t2, [(6.0, (2.4, 4.8, 1.8), (3.0, 2.0, 1.4)), (6.8, (3.0, 2.6, 1.4), (2.9, 0.0, 1.2)), (7.6, (3.0, 0.4, 1.3), (2.6, -2.8, 1.0)),
               (8.4, (2.5, -2.4, 1.0), (0.6, -3.6, 0.8)), (9.0, (1.6, -3.6, 1.1), (0.0, -1.5, 0.6))]); shots.append((6.0, c2))
-c3, t3 = cam('C3_orbita', 32, 4.0)
-orb = [(9.0 + i * 0.5, (5.2 * math.cos(math.radians(-60 + i * 9)), 5.2 * math.sin(math.radians(-60 + i * 9)), 1.3), (0, 0, 0.6)) for i in range(7)]
+c3, t3 = cam('C3_orbita', 20, 4.0)
+# orbita davanti al muso, dentro le pareti e lontano dall'arredo (prima usciva dal muro destro)
+orb = [(9.0 + i * 0.5, (3.3 * math.cos(math.radians(-135 + i * 15)), 3.95 * math.sin(math.radians(-135 + i * 15)), 1.75), (0, 0.2, 1.1)) for i in range(7)]
 path(c3, t3, orb); shots.append((9.0, c3))
 c4, t4 = cam('C4_telo', 26, 4.0)
 path(c4, t4, [(12.0, (3.8, -5.2, 1.1), (0, 0.2, 0.7)), (15.0, (3.6, -4.9, 1.0), (0, 0.6, 0.8))]); shots.append((12.0, c4))

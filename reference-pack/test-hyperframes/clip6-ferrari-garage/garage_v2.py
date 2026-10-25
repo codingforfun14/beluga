@@ -90,11 +90,11 @@ def cloth_material(asset):
     d = os.path.join(asset, 'tex', 'denim_fabric')
     m = bpy.data.materials.new('telo_v2'); m.use_nodes = True
     nt = m.node_tree; p = nt.nodes['Principled BSDF']
-    tc = nt.nodes.new('ShaderNodeTexCoord'); mp = nt.nodes.new('ShaderNodeMapping'); mp.inputs['Scale'].default_value = (1 / 0.25,) * 3
+    tc = nt.nodes.new('ShaderNodeTexCoord'); mp = nt.nodes.new('ShaderNodeMapping'); mp.inputs['Scale'].default_value = (1 / 0.12,) * 3   # trama fine: a 25 cm si vedevano le ripetizioni
     nt.links.new(tc.outputs['Object'], mp.inputs['Vector'])
     rg = _img(nt, f'{d}/denim_fabric_rough_1k.jpg', False, mp.outputs['Vector'])
     nr = _img(nt, f'{d}/denim_fabric_nor_gl_1k.jpg', False, mp.outputs['Vector'])
-    nm = nt.nodes.new('ShaderNodeNormalMap'); nm.inputs['Strength'].default_value = 0.8
+    nm = nt.nodes.new('ShaderNodeNormalMap'); nm.inputs['Strength'].default_value = 0.35
     nt.links.new(nr.outputs['Color'], nm.inputs['Color']); nt.links.new(nm.outputs['Normal'], p.inputs['Normal'])
     nt.links.new(_math(nt, 'ADD', _math(nt, 'MULTIPLY', rg.outputs['Color'], 0.3), 0.65), p.inputs['Roughness'])
     # polvere sulle parti rivolte verso l'alto
