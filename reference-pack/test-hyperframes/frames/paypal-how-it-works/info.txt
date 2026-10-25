@@ -1,0 +1,14 @@
+source: https://www.youtube.com/watch?v=WB370ewOklw
+title: How PayPal Works
+channel: PayPal
+upload_date: 20150311
+views: 509140
+description: Are you looking for a fast, secure, easy way to pay online and on mobile? Welcome to PayPal! Signing up is easy- just watch this brief tutorial for details. Whether you're on your computer, tablet or mobile phone, PayPal let's you pay with just a few clicks. What are you going to use PayPal for? |  | Subscribe to PayPal: http://bit.ly/paypalsub | Sign up for PayPal: http://bit.ly/1nU1N9G | Visit the PayPal Website: http://bit.ly/paypalwebsite | Visit the PayPal Blog: http://bit.ly/1Nnbz9m | PayPal on Facebook: http://on.fb.me/1I0kniI | PayPal on Twitter: http://bit.ly/pypltwitter
+width=1280
+height=720
+r_frame_rate=30000/1001
+duration=73.862676
+scene_cuts: 0 (ffmpeg scene threshold 0.3)
+average_shot_length_s: 73.86
+scene_changes_soft (soglia 0.12): 4
+scene frames: frames_time.txt; sheet.jpg: 20 fotogrammi equidistanti con il tempo
