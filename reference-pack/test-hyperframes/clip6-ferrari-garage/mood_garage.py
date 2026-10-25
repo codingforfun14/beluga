@@ -6,6 +6,7 @@ from mathutils import Vector
 argv = sys.argv[sys.argv.index('--') + 1:]
 out = argv[0]; SAMPLES = int(argv[1]) if len(argv) > 1 else 32
 random.seed(4)
+ASSET = argv[2] if len(argv) > 2 else __import__('os').path.expanduser('~/Desktop/DIGITALIZA/render-clip6/asset')
 bpy.ops.wm.read_factory_settings(use_empty=True)
 sc = bpy.context.scene
 
@@ -25,6 +26,27 @@ def mat(name, color, rough, emit=None, estr=0.0, metal=0.0, noise=None):
         b = nt.nodes.new('ShaderNodeBump'); b.inputs['Strength'].default_value = 0.08
         nt.links.new(n.outputs['Fac'], b.inputs['Height']); nt.links.new(b.outputs[0], p.inputs['Normal'])
     return m
+def pbr(name, tex, tile=2.0, tint=1.0, rough_mul=1.0):
+    """materiale PBR da texture Poly Haven, proiezione a box in coordinate oggetto (niente UV)"""
+    import os
+    d = os.path.join(ASSET, 'tex', tex)
+    m = bpy.data.materials.new(name); m.use_nodes = True
+    nt = m.node_tree; p = nt.nodes['Principled BSDF']
+    tc = nt.nodes.new('ShaderNodeTexCoord'); mp = nt.nodes.new('ShaderNodeMapping')
+    mp.inputs['Scale'].default_value = (1 / tile, 1 / tile, 1 / tile)
+    nt.links.new(tc.outputs['Object'], mp.inputs['Vector'])
+    def img(kind, color=True):
+        f = os.path.join(d, f'{tex}_{kind}_2k.jpg')
+        n = nt.nodes.new('ShaderNodeTexImage'); n.image = bpy.data.images.load(f); n.projection = 'BOX'; n.projection_blend = 0.2
+        if not color: n.image.colorspace_settings.name = 'Non-Color'
+        nt.links.new(mp.outputs['Vector'], n.inputs['Vector']); return n
+    dif = img('diff'); hsv = nt.nodes.new('ShaderNodeHueSaturation'); hsv.inputs['Value'].default_value = tint
+    nt.links.new(dif.outputs['Color'], hsv.inputs['Color']); nt.links.new(hsv.outputs['Color'], p.inputs['Base Color'])
+    rg = img('rough', False); mr = nt.nodes.new('ShaderNodeMath'); mr.operation = 'MULTIPLY'; mr.inputs[1].default_value = rough_mul
+    nt.links.new(rg.outputs['Color'], mr.inputs[0]); nt.links.new(mr.outputs[0], p.inputs['Roughness'])
+    nm = nt.nodes.new('ShaderNodeNormalMap'); nr = img('nor_gl', False)
+    nt.links.new(nr.outputs['Color'], nm.inputs['Color']); nt.links.new(nm.outputs['Normal'], p.inputs['Normal'])
+    return m
 def box(name, loc, size, m, rot=(0, 0, 0)):
     bpy.ops.mesh.primitive_cube_add(size=1, location=loc, rotation=rot)
     o = bpy.context.object; o.name = name; o.scale = size; o.data.materials.append(m); return o
@@ -32,10 +54,10 @@ def cyl(name, loc, r, h, m, rot=(0, 0, 0), verts=32):
     bpy.ops.mesh.primitive_cylinder_add(vertices=verts, radius=r, depth=h, location=loc, rotation=rot)
     o = bpy.context.object; o.name = name; o.data.materials.append(m); return o
 
-m_floor = mat('cemento_lucido', (0.05, 0.05, 0.052), 0.3, noise=1.6)
-m_wall = mat('blocchi', (0.09, 0.09, 0.095), 0.85)
+m_floor = pbr('pavimento_garage', 'garage_floor', 2.5, 0.6, 0.55)
+m_wall = pbr('blocchi', 'concrete_block_wall', 2.0, 0.55)
 m_metal = mat('metallo', (0.25, 0.25, 0.26), 0.35, metal=1.0)
-m_door = mat('saracinesca', (0.18, 0.185, 0.19), 0.45, metal=0.8)
+m_door = pbr('saracinesca', 'corrugated_iron_02', 1.5, 0.7)
 m_day = mat('esterno', (1, 1, 1), 1.0, emit=(1.0, 0.93, 0.85), estr=12.0)
 m_tube = mat('neon', (1, 1, 1), 0.3, emit=(0.85, 0.92, 1.0), estr=0.0)
 m_cloth = mat('telo', (0.09, 0.09, 0.1), 0.85)
@@ -47,7 +69,9 @@ m_led_r = mat('led_rosso', (0, 0, 0), 0.5, emit=(1, 0.05, 0.03), estr=20)
 m_led_w = mat('led_bianco', (0, 0, 0), 0.5, emit=(1, 1, 1), estr=40)
 
 w = bpy.data.worlds.new('w'); sc.world = w; w.use_nodes = True
-w.node_tree.nodes['Background'].inputs[0].default_value = (0.002, 0.002, 0.0025, 1)
+wn = w.node_tree; bgn = wn.nodes['Background']
+env = wn.nodes.new('ShaderNodeTexEnvironment'); env.image = bpy.data.images.load(ASSET + '/hdri/abandoned_garage_2k.exr')
+wn.links.new(env.outputs['Color'], bgn.inputs['Color']); bgn.inputs['Strength'].default_value = 0.035  # solo riflessi, il garage resta buio
 
 # --- garage 8 x 12 m, alto 4 m; saracinesca sul fondo (y = 6) alzata per 0.9 m
 W, L, H = 8.0, 12.0, 4.0
