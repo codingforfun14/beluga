@@ -1,0 +1,14 @@
+source: https://www.youtube.com/watch?v=xwH4oVnuIAs
+title: The official rebrand introduction video for Burger King
+channel: STIR
+upload_date: 20210112
+views: 1980647
+description: The new brand identity for Burger King by Jones Knowles Ritchie: wrapping up all the visual design aspects of the new, vibrant yet simplified visual design | For more, visit https://bit.ly/3lmdC8a
+width=1280
+height=720
+r_frame_rate=24000/1001
+duration=83.940136
+scene_cuts: 79 (ffmpeg scene threshold 0.3)
+average_shot_length_s: 1.05
+scene_changes_soft (soglia 0.12): 186
+scene frames: frames_time.txt; sheet.jpg: 20 fotogrammi equidistanti con il tempo

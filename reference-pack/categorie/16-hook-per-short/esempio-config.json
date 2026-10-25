@@ -1,0 +1,15 @@
+{
+  "bg": "#0B1F3A",
+  "acc": "#19C2A0",
+  "acc2": "#C9A227",
+  "brand": "BELUGA",
+  "label": false,
+  "t": {
+    "slam": ["IL TUO", "AFFITTO", "RENDE?"],
+    "result": "+6,2%",
+    "resultSub": "rendimento netto annuo",
+    "stat": 1.2,
+    "statUnit": "K",
+    "statLabel": "investitori in 30 giorni"
+  }
+}

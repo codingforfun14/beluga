@@ -1,0 +1,6 @@
+source: https://player.vimeo.com/video/1177272159 (embedded on https://futuredeluxe.com/work/nothing-a)
+width=1080
+height=1080
+r_frame_rate=25/1
+duration=49.130667
+scene_frames: 17 (of 17 detected at threshold 0.3; evenly subsampled when over 40)

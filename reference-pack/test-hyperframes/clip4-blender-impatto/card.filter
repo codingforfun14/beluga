@@ -1,0 +1,1 @@
+drawtext=fontfile=/System/Library/Fonts/HelveticaNeue.ttc:textfile=t1.txt:fontcolor=white:fontsize=72:x=(w-tw)/2:y=h/2-80:alpha='if(lt(t\,0.2)\,0\,min(1\,(t-0.2)/0.3))',drawtext=fontfile=/System/Library/Fonts/HelveticaNeue.ttc:textfile=t2.txt:fontcolor=0x9ec9ff:fontsize=72:x=(w-tw)/2:y=h/2+10:alpha='if(lt(t\,0.9)\,0\,min(1\,(t-0.9)/0.3))'

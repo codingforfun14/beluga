@@ -1,0 +1,11 @@
+source: https://www.youtube.com/watch?v=WBcM3ZUnQoE
+width=1920
+height=1080
+r_frame_rate=24000/1001
+duration=60.114000
+scene_cuts: 10 (ffmpeg scene threshold 0.3)
+average_shot_length_s: 5.46
+scene_frames: 11 (first frame at 0.1 s + one frame 0.15 s after each cut; evenly subsampled when over 40)
+cut timestamps: cuts.txt; frame timestamps: frames_time.txt
+timeline.jpg: 20 frames evenly spaced (timestamp printed on each)
+note: upload by PUB Magazine (Cannes Lions 2026 entry); no upload found on Anthropic/Claude official channels

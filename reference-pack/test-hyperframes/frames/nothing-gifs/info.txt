@@ -1,0 +1,8 @@
+NOT2578_BELLSPROUT_HOPPIP_bellsprout_pro_white_destruct_v008.gif: 800,800 2.200000  frames=22 source=https://futuredeluxe.com/wp-content/uploads/2026/03/NOT2578_BELLSPROUT_HOPPIP_bellsprout_pro_white_destruct_v008-ezgif.com-video-to-gif-converter.gif
+NOT2578_audio_kj_v008.gif: 800,800 5.000000  frames=50 source=https://futuredeluxe.com/wp-content/uploads/2026/03/NOT2578_audio_kj_v008-ezgif.com-video-to-gif-converter.gif
+NOT2578_ksp06_v011.gif: 800,800 5.500000  frames=55 source=https://futuredeluxe.com/wp-content/uploads/2026/03/NOT2578_ksp06_v011-ezgif.com-video-to-gif-converter.gif
+NOT2578_ksp11-01_v7b.gif: 800,800 5.000000  frames=50 source=https://futuredeluxe.com/wp-content/uploads/2026/03/NOT2578_ksp11-01_v7b-ezgif.com-video-to-gif-converter.gif
+NOT2578_ksp11-02_v020.gif: 800,800 5.000000  frames=50 source=https://futuredeluxe.com/wp-content/uploads/2026/03/NOT2578_ksp11-02_v020-ezgif.com-video-to-gif-converter.gif
+gif_3.gif: 800,800 5.000000  frames=50 source=https://futuredeluxe.com/wp-content/uploads/2026/03/ezgif.com-video-to-gif-converter-3-1.gif
+nothing_4.gif: 800,800 3.000000  frames=30 source=https://futuredeluxe.com/wp-content/uploads/2026/03/nothing_4.gif
+nothing_gif_1.gif: 800,800 1.300000  frames=13 source=https://futuredeluxe.com/wp-content/uploads/2026/03/nothing_gif_1.gif

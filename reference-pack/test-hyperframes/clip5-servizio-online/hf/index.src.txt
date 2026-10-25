@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="it"><head><meta charset="UTF-8"/><meta name="viewport" content="width=1920, height=1080"/>
+<script src="assets/js/gsap.min.js"></script>
+<style>
+:root{--cream:#F3F0E9;--mute:#9A968E;--orange:#FF5A1F;--ink:#0B0B0C}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1920px;height:1080px;overflow:hidden;background:transparent}
+#root{width:1920px;height:1080px;position:relative;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--cream)}
+/* interfaccia sulla card: 1000x620 unita', proiettata sugli angoli della card del render (omografia) */
+#ui{position:absolute;left:0;top:0;width:1000px;height:620px;transform-origin:0 0;padding:64px 70px}
+#ui .head{display:flex;align-items:center;gap:16px;font-size:26px;font-weight:700;letter-spacing:.14em}
+#ui .head .doc{margin-left:auto;font-weight:400;letter-spacing:.02em;color:var(--mute);font-size:24px}
+.mark{width:36px;height:36px;border-radius:9px;background:var(--orange);display:flex;align-items:center;justify-content:center}
+.mark svg{width:70%;height:70%}
+#n730{font-size:236px;font-weight:700;letter-spacing:-.045em;line-height:1;margin-top:34px}
+#ui .row{position:absolute;left:70px;right:70px;bottom:62px;display:flex;align-items:center;gap:22px;font-size:54px}
+#ok{width:74px;height:74px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center}
+#ok svg{width:46px;height:46px}
+#sent{font-weight:500}
+#time{margin-left:auto;font-weight:300;color:var(--cream);display:flex;align-items:baseline;gap:14px}
+#time small{font-size:22px;color:var(--mute);letter-spacing:.08em;text-transform:uppercase}
+.chk{fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:30;stroke-dashoffset:30}
+/* claim */
+#dim{position:absolute;inset:0;background:#050506;opacity:0}
+.claim{position:absolute;left:150px;width:1620px;font-size:124px;letter-spacing:-.025em;line-height:1}
+#c1{top:368px;font-weight:700}
+#c2{top:520px;font-weight:200}
+.claim span{display:inline-block;margin-right:.24em}
+/* end card */
+#end{position:absolute;inset:0;background:var(--ink)}
+#logo{position:absolute;left:0;width:1920px;top:400px;display:flex;justify-content:center;align-items:center;gap:30px}
+#logo .mark{width:104px;height:104px;border-radius:26px}
+#logo .word{font-size:132px;font-weight:700;letter-spacing:.06em}
+#tag{position:absolute;left:0;width:1920px;top:600px;text-align:center;font-size:46px;font-weight:300;color:var(--cream);letter-spacing:.01em}
+</style></head><body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="20" data-width="1920" data-height="1080" data-fps="60">
+ <div id="ui" class="clip" data-start="12.2" data-duration="3.55" data-track-index="1">
+  <div class="head"><div class="mark"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7" style="fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round"/></svg></div><span>PRATICA</span><span class="doc">Modello 730 · 2026</span></div>
+  <div id="n730">730</div>
+  <div class="row"><div id="ok"><svg viewBox="0 0 24 24"><path id="okp" class="chk" d="M5 12.5l4.2 4.2L19 7"/></svg></div><span id="sent">Inviata</span><span id="time"><small>tempo</small>3 min</span></div>
+ </div>
+ <div id="dim" class="clip" data-start="15.45" data-duration="2.1" data-track-index="2"></div>
+ <h1 id="c1" class="claim clip" data-start="15.55" data-duration="1.95" data-track-index="3"><span>PESANTE</span><span>PER</span><span>NOI.</span></h1>
+ <h1 id="c2" class="claim clip" data-start="16.25" data-duration="1.25" data-track-index="4"><span>LEGGERA</span><span>PER</span><span>TE.</span></h1>
+ <div id="end" class="clip" data-start="17.5" data-duration="2.5" data-track-index="5">
+  <div id="logo"><div class="mark"><svg viewBox="0 0 24 24"><path id="endp" class="chk" d="M5 12.5l4.2 4.2L19 7" style="stroke-width:3"/></svg></div><span class="word">PRATICA</span></div>
+  <div id="tag">La burocrazia, dal telefono.</div>
+ </div>
+</div>
+<script>
+const TRACK = /*TRACK*/;
+// omografia: rettangolo 1000x620 -> quattro angoli in pixel (tl, tr, br, bl)
+function homography(p){
+  const W=1000,H=620,[x0,y0]=p[0],[x1,y1]=p[1],[x2,y2]=p[2],[x3,y3]=p[3];
+  const dx1=x1-x2,dx2=x3-x2,dy1=y1-y2,dy2=y3-y2,sx=x0-x1+x2-x3,sy=y0-y1+y2-y3;
+  const den=dx1*dy2-dx2*dy1, g=(sx*dy2-dx2*sy)/den, h=(dx1*sy-sx*dy1)/den;
+  const a=x1-x0+g*x1, b=x3-x0+h*x3, c=x0, d=y1-y0+g*y1, e=y3-y0+h*y3, f=y0;
+  const m=[a/W,d/W,0,g/W, b/H,e/H,0,h/H, 0,0,1,0, c,f,0,1];
+  return 'matrix3d('+m.map(v=>+v.toFixed(8)).join(',')+')';
+}
+const tl=gsap.timeline({paused:true});
+const fps=TRACK.fps;
+Object.keys(TRACK.frames).map(Number).sort((a,b)=>a-b).forEach(n=>{
+  tl.set('#ui',{transform:homography(TRACK.frames[n])},n/fps);
+});
+// interfaccia
+tl.fromTo('#ui .head',{opacity:0,y:14},{opacity:1,y:0,duration:.45,ease:'power3.out'},12.3);
+tl.fromTo('#n730',{opacity:0,y:40,filter:'blur(8px)'},{opacity:1,y:0,filter:'blur(0px)',duration:.6,ease:'power4.out'},12.5);
+tl.fromTo('#ok',{scale:0},{scale:1,duration:.35,ease:'back.out(2.4)'},12.95);
+tl.to('#okp',{strokeDashoffset:0,duration:.22,ease:'power2.inOut'},13.05);
+tl.fromTo('#sent',{opacity:0,x:-18},{opacity:1,x:0,duration:.4,ease:'power3.out'},13.22);
+tl.fromTo('#time',{opacity:0},{opacity:1,duration:.4,ease:'power2.out'},13.55);
+tl.to('#ui > *',{opacity:0,duration:.3,ease:'power2.in'},15.4);
+// claim
+tl.fromTo('#dim',{opacity:0},{opacity:.84,duration:.35,ease:'power2.out'},15.45);
+tl.fromTo('#c1 span',{opacity:0,y:50,filter:'blur(6px)'},{opacity:1,y:0,filter:'blur(0px)',duration:.4,ease:'power4.out',stagger:.08},15.55);
+tl.fromTo('#c2 span',{opacity:0,y:-30,filter:'blur(6px)'},{opacity:1,y:0,filter:'blur(0px)',duration:.6,ease:'power2.out',stagger:.1},16.25);
+// end card
+tl.fromTo('#logo',{opacity:0,scale:.96},{opacity:1,scale:1,duration:.5,ease:'power3.out'},17.55);
+tl.to('#endp',{strokeDashoffset:0,duration:.22,ease:'power2.inOut'},17.85);
+tl.fromTo('#tag',{opacity:0,y:16},{opacity:1,y:0,duration:.5,ease:'power3.out'},18.05);
+window.__timelines=window.__timelines||{};
+window.__timelines["main"]=tl;
+tl.seek(0);
+</script></body></html>

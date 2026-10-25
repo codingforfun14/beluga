@@ -1,0 +1,14 @@
+source: https://www.youtube.com/watch?v=stVA57Rf4aM
+title: Do more than store with Dropbox
+channel: Dropbox
+upload_date: 20240306
+views: 9854
+description: Do more than store with Dropbox. Easily edit PDFs, send contracts out for signature, and collaborate on video, image and audio projects—all in one place. dropbox.com/overview/teams |  | Subscribe: https://www.youtube.com/user/dropbox?sub_confirmation=1 |  | Dropbox is the one place to keep life organized and keep work moving. With more than 700 million registered users across 180 countries, we're on a mission to design a more enlightened way of working.  |  | Connect with Dropbox: | http://www.twitter.com/dropbox | http://www.instagram.com/dropbox | http://www.facebook.com/dropbox | https://www.linkedin.com/company/dropbox | https://www.threads.net/@dropbox | https://www.tiktok.com/@dropbox
+width=1280
+height=720
+r_frame_rate=24000/1001
+duration=60.023583
+scene_cuts: 18 (ffmpeg scene threshold 0.3)
+average_shot_length_s: 3.16
+scene_changes_soft (soglia 0.12): 27
+scene frames: frames_time.txt; sheet.jpg: 20 fotogrammi equidistanti con il tempo

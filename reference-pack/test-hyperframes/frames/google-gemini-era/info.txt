@@ -1,0 +1,14 @@
+source: https://www.youtube.com/watch?v=_fuimO6ErKI
+title: Google – Welcome to the Gemini era
+channel: Google
+upload_date: 20240514
+views: 55640610
+description: The Gemini era is here, bringing the magic of AI to the tools you use everyday. Catch up on all the latest announcements and demos from #GoogleIO → https://io.google |  | Audio described version here: https://youtu.be/u8HK5GEt9KY |  | Watch the full Google I/O 2024 keynote: https://www.youtube.com/live/XEzRZ35urlk?si=Yo3HTskWQMJwdf3G |  | To watch this keynote with American Sign Language (ASL) interpretation, please click here: https://www.youtube.com/live/6rP2rEWsfpM?si=RuVQFeK4ESnOsUnp |  | #GoogleIO2024 |  | Subscribe to our Channel: https://www.youtube.com/google | Find us on X: https://twitter.com/google | Watch us on TikTok: https://tiktok.com/@google | Follow us on Instagram: https://
+width=1280
+height=720
+r_frame_rate=30000/1001
+duration=60.093243
+scene_cuts: 23 (ffmpeg scene threshold 0.3)
+average_shot_length_s: 2.50
+scene_changes_soft (soglia 0.12): 66
+scene frames: frames_time.txt; sheet.jpg: 20 fotogrammi equidistanti con il tempo
