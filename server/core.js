@@ -14,7 +14,7 @@ const CHAT = path.join(L.TASKS, 'chat.jsonl');
 const AGENTI = path.join(L.TASKS, 'agenti.json');
 const v2 = n => String(n).padStart(2, '0');
 
-const modelli = () => L.readJSON(path.join(L.ROOT, 'modelli.json'), { ruoli: {} });
+const modelli = L.readModelli;
 const projects = () => {
   try { return fs.readdirSync(L.PROJECTS).filter(p => L.safeName(p) && fs.existsSync(path.join(L.PROJECTS, p, 'CONTESTO.md'))); } catch { return []; }
 };
@@ -288,16 +288,13 @@ async function assign(ruolo, programma) {
     const pr = await agents.probe(programma);
     if (!pr.installato) return { errore: `${programma === 'codex' ? 'Codex' : 'Claude'} non è installato sul Mac.`, codice: 409 };
   }
-  const file = path.join(L.ROOT, 'modelli.json');
-  const conf = L.readJSON(file, null);
-  if (!conf || !conf.ruoli || !conf.ruoli[ruolo]) return { errore: 'modelli.json non leggibile.', codice: 500 };
-  const r = conf.ruoli[ruolo];
-  if (r.programma !== programma) {
-    r.programma = programma;
-    r.temporaneo = !!r.definitivo && r.definitivo !== programma;
-    L.writeJSON(file, conf);
-  }
-  return { ruolo, programma, temporaneo: r.temporaneo };
+  const conf = modelli();
+  if (!conf.ruoli || !conf.ruoli[ruolo]) return { errore: 'modelli.json non leggibile.', codice: 500 };
+  // La scelta resta in modelli.locale.json, che non va su GitHub.
+  const temporaneo = !!conf.ruoli[ruolo].definitivo && conf.ruoli[ruolo].definitivo !== programma;
+  const loc = L.readJSON(L.MODELLI_LOCALE, {});
+  L.writeJSON(L.MODELLI_LOCALE, L.merge(loc, { ruoli: { [ruolo]: { programma, temporaneo } } }));
+  return { ruolo, programma, temporaneo };
 }
 
 module.exports = { STATI, list, get, receive, act, chat, startWorker, stopWorker, status, assign, planBPrompt, projects, workDir };

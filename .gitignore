@@ -9,3 +9,6 @@ projects/*/tmp/*
 projects/*/previews/*
 projects/*/finals/*
 !projects/*/*/.gitkeep
+
+# Impostazioni di questo Mac: percorsi, modello, chi lavora. Non vanno su GitHub.
+modelli.locale.json
