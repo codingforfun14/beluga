@@ -78,7 +78,7 @@ m_ceil = mat('soffitto', (0.035, 0.035, 0.037), 0.85)
 m_door = pbr('saracinesca', 'corrugated_iron_02', 1.5, 0.7)
 m_metal = mat('metallo', (0.2, 0.2, 0.21), 0.6, metal=0.6)   # acciaio opaco: non specchia la saracinesca
 m_day = mat('esterno', (1, 1, 1), 1.0, emit=(1.0, 0.93, 0.85), estr=8.0)
-m_tube = mat('neon', (0.08, 0.08, 0.085), 0.5, emit=(0.85, 0.92, 1.0), estr=0.0)   # spento: scuro, non bianco
+m_tube = mat('neon', (0.03, 0.03, 0.032), 0.9, emit=(0.85, 0.92, 1.0), estr=0.0)   # spento: scuro, non bianco
 m_cloth = g2.cloth_material(ASSET)   # v2: trama di tessuto e polvere
 m_tire = mat('gomma', (0.02, 0.02, 0.02), 0.7)
 m_cab = mat('cassettiera', (0.12, 0.12, 0.13), 0.4, metal=0.6)
@@ -107,10 +107,10 @@ box('asfalto_fuori', (0, L / 2 + 12, -0.04), (40, 24, 0.05), m_asphalt)
 dl = bpy.data.lights.new('luce_porta', 'AREA'); dl.shape = 'RECTANGLE'; dl.size = DW; dl.size_y = 1.0; dl.energy = 0
 dl.color = (1.0, 0.88, 0.72)   # luce calda del giorno che entra dalla fessura
 dlo = link(bpy.data.objects.new('luce_porta', dl)); dlo.location = (0, L / 2 + 0.3, 0.6); dlo.rotation_euler = (math.radians(-90), 0, 0)
-keyval(dl, 'energy', [(1, 0), (F(0.4), 0), (F(3.0), 350)])
+keyval(dl, 'energy', [(1, 0), (F(0.4), 0), (F(3.0), 700)])
 sun = bpy.data.lights.new('sole', 'SUN'); sun.energy = 6; sun.color = (1, 0.9, 0.78); sun.angle = math.radians(0.8)
 so = link(bpy.data.objects.new('sole', sun)); so.rotation_euler = Vector((0.2, -0.93, -0.3)).to_track_quat('-Z', 'Y').to_euler()
-amb = bpy.data.lights.new('ambiente', 'AREA'); amb.energy = 6; amb.size = 6; amb.color = (0.75, 0.82, 1.0); amb.use_shadow = False
+amb = bpy.data.lights.new('ambiente', 'AREA'); amb.energy = 35; amb.size = 6; amb.color = (0.75, 0.82, 1.0); amb.use_shadow = False
 ao = link(bpy.data.objects.new('ambiente', amb)); ao.location = (0, -2, H - 0.3)
 
 tubes, tube_lights = [], []
@@ -131,6 +131,13 @@ def neon_on(i, t0, flicker=True):
 neon_on(2, 7.5)
 for k, i in enumerate([1, 4, 0, 3, 5]):
     neon_on(i, 15.25 + 0.22 * k)
+# interpolazione a gradino: con le curve morbide i neon si "accendevano" gia' prima del tempo (curva che anticipa il valore)
+from bpy_extras import anim_utils
+for idb in [t.data.materials[0].node_tree for t in tubes] + tube_lights:
+    ad = idb.animation_data
+    if not ad or not ad.action: continue
+    for fc in anim_utils.action_get_channelbag_for_slot(ad.action, ad.action_slot).fcurves:
+        for kp in fc.keyframe_points: kp.interpolation = 'CONSTANT'
 # oggetti del garage (v2: modelli CC0 di Poly Haven)
 g2.props(ASSET, W, L, H, box, m_metal, m_wood)
 
@@ -185,14 +192,14 @@ for o in (col, floor):
 
 # ------------------------------------------------------------------ telo: prima si appoggia (pre-roll), poi diventa la forma di partenza
 bpy.ops.mesh.primitive_grid_add(x_subdivisions=70, y_subdivisions=95, size=1, location=(0, 0, CAR_H + 0.25))
-cloth = bpy.context.object; cloth.name = 'telo'; cloth.scale = (4.3, 6.6, 1); bpy.ops.object.transform_apply(scale=True)
+cloth = bpy.context.object; cloth.name = 'telo'; cloth.scale = (3.9, 6.4, 1); bpy.ops.object.transform_apply(scale=True)   # misura giusta: l'orlo arriva a terra e fa pieghe, non un tappeto
 cloth.data.materials.append(m_cloth)
 pin_idx = [v.index for v in cloth.data.vertices if v.co.y < -3.05 and abs(v.co.x) < 0.5]
 cm = cloth.modifiers.new('cloth', 'CLOTH'); cm.settings.quality = 8; cm.settings.mass = 0.4
-cm.settings.tension_stiffness = 8; cm.settings.bending_stiffness = 0.6
-cm.collision_settings.collision_quality = 3; cm.collision_settings.distance_min = 0.012
-cm.point_cache.frame_start, cm.point_cache.frame_end = 1, 90
-for f in range(1, 91): sc.frame_set(f)
+cm.settings.tension_stiffness = 10; cm.settings.bending_stiffness = 2.5   # tela pesante: pieghe larghe
+cm.collision_settings.collision_quality = 3; cm.collision_settings.distance_min = 0.012; cm.collision_settings.use_self_collision = True
+cm.point_cache.frame_start, cm.point_cache.frame_end = 1, 110
+for f in range(1, 111): sc.frame_set(f)
 bpy.context.view_layer.objects.active = cloth
 bpy.ops.object.modifier_apply(modifier='cloth')
 sc.frame_set(1)
@@ -413,7 +420,7 @@ sc.camera = c1
 # ------------------------------------------------------------------ render
 sc.render.engine = 'BLENDER_EEVEE'
 e = sc.eevee
-settings = [('taa_render_samples', 24 if FINAL else 8), ('use_shadows', True), ('use_raytracing', FINAL),
+settings = [('taa_render_samples', 48 if FINAL else 8), ('use_shadows', True), ('use_raytracing', FINAL),
             ('volumetric_tile_size', '8'), ('volumetric_samples', 64), ('use_volumetric_shadows', FINAL)]
 for attr, val in settings:
     if hasattr(e, attr):

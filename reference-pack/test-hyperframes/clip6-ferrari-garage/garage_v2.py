@@ -40,32 +40,36 @@ def floor_material(asset):
     def joint(c):
         f = _math(nt, 'FRACT', _math(nt, 'ADD', _math(nt, 'DIVIDE', c, 3.0), 0.5))
         dd = _math(nt, 'ABSOLUTE', _math(nt, 'SUBTRACT', f, 0.5))
-        return _math(nt, 'LESS_THAN', dd, 0.004)
+        return _math(nt, 'LESS_THAN', dd, 0.007)
     joints = _math(nt, 'MAXIMUM', joint(X), joint(Y))
     # macchie d'olio (scure, un po' lucide), soprattutto dove sta l'auto
     n1 = nt.nodes.new('ShaderNodeTexNoise'); n1.inputs['Scale'].default_value = 0.9; n1.inputs['Detail'].default_value = 6
     nt.links.new(obj, n1.inputs['Vector'])
-    oil = _ramp(nt, n1.outputs['Fac'], [(0.62, 0.0), (0.7, 1.0)])
+    oil = _ramp(nt, n1.outputs['Fac'], [(0.56, 0.0), (0.64, 1.0)])
     # segni di gomme: due fasce lungo Y (l'auto entra dalla saracinesca), spezzate dal rumore
     def band(cx):
         dd = _math(nt, 'ABSOLUTE', _math(nt, 'SUBTRACT', X, cx))
-        return _math(nt, 'LESS_THAN', dd, 0.12)
+        return _math(nt, 'LESS_THAN', dd, 0.14)
     tracks = _math(nt, 'MAXIMUM', band(0.82), band(-0.82))
     n2 = nt.nodes.new('ShaderNodeTexNoise'); n2.inputs['Scale'].default_value = 4.0; n2.inputs['Detail'].default_value = 8
     nt.links.new(obj, n2.inputs['Vector'])
-    tracks = _math(nt, 'MULTIPLY', tracks, _ramp(nt, n2.outputs['Fac'], [(0.45, 0.0), (0.6, 0.55)]))
+    tracks = _math(nt, 'MULTIPLY', tracks, _ramp(nt, n2.outputs['Fac'], [(0.35, 0.0), (0.55, 0.9)]))
     # pozze: maschera netta (bordi a gradino), lisce e scure
     n3 = nt.nodes.new('ShaderNodeTexNoise'); n3.inputs['Scale'].default_value = 0.45; n3.inputs['Detail'].default_value = 3
     n3.inputs['Roughness'].default_value = 0.45; nt.links.new(obj, n3.inputs['Vector'])
     puddle = _ramp(nt, n3.outputs['Fac'], [(0.56, 0.0), (0.565, 1.0)], 'CONSTANT')
     # colore
     dark = nt.nodes.new('ShaderNodeMix'); dark.data_type = 'RGBA'; dark.blend_type = 'MULTIPLY'
-    nt.links.new(dif.outputs['Color'], dark.inputs[6]); dark.inputs[7].default_value = (0.55, 0.55, 0.55, 1)
+    nt.links.new(dif.outputs['Color'], dark.inputs[6]); dark.inputs[7].default_value = (0.3, 0.3, 0.3, 1)
     nt.links.new(_math(nt, 'MAXIMUM', _math(nt, 'MULTIPLY', oil, 0.85), _math(nt, 'MAXIMUM', joints, tracks)), dark.inputs['Factor'])
     wet = nt.nodes.new('ShaderNodeMix'); wet.data_type = 'RGBA'; wet.blend_type = 'MULTIPLY'
     nt.links.new(dark.outputs[2], wet.inputs[6]); wet.inputs[7].default_value = (0.45, 0.45, 0.45, 1)
     nt.links.new(puddle, wet.inputs['Factor'])
-    hsv = nt.nodes.new('ShaderNodeHueSaturation'); hsv.inputs['Value'].default_value = 0.55; hsv.inputs['Saturation'].default_value = 0.7
+    hsv = nt.nodes.new('ShaderNodeHueSaturation'); hsv.inputs['Value'].default_value = 0.55; hsv.inputs['Saturation'].default_value = 0.5
+    # meno contrasto nella texture: da lontano e di taglio in Eevee sfarfallava come ghiaia
+    soft = nt.nodes.new('ShaderNodeMix'); soft.data_type = 'RGBA'; soft.inputs['Factor'].default_value = 0.55
+    nt.links.new(dif.outputs['Color'], soft.inputs[6]); soft.inputs[7].default_value = (0.32, 0.31, 0.29, 1)
+    nt.links.new(soft.outputs[2], dark.inputs[6])
     nt.links.new(wet.outputs[2], hsv.inputs['Color']); nt.links.new(hsv.outputs['Color'], p.inputs['Base Color'])
     # rugosita': cemento opaco, olio un po' lucido, pozze a specchio
     r0 = _math(nt, 'MULTIPLY', rgh.outputs['Color'], 0.65)   # cemento lisciato da garage, non ghiaia
@@ -76,7 +80,7 @@ def floor_material(asset):
     nt.links.new(rgh_mix.outputs[0], p.inputs['Roughness'])
     # normali: dettaglio del cemento + solco dei giunti; nelle pozze la superficie e' piatta
     nm = nt.nodes.new('ShaderNodeNormalMap'); nt.links.new(nor.outputs['Color'], nm.inputs['Color'])
-    nt.links.new(_math(nt, 'MULTIPLY', _math(nt, 'SUBTRACT', 1.0, puddle), 0.35), nm.inputs['Strength'])
+    nt.links.new(_math(nt, 'MULTIPLY', _math(nt, 'SUBTRACT', 1.0, puddle), 0.12), nm.inputs['Strength'])
     bump = nt.nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value = 0.6; bump.invert = True
     nt.links.new(joints, bump.inputs['Height']); nt.links.new(nm.outputs['Normal'], bump.inputs['Normal'])
     nt.links.new(bump.outputs['Normal'], p.inputs['Normal'])
