@@ -2,7 +2,7 @@
 
 - Fotogrammi Blender (JPEG 1920×1080, 60 fps, 1–930 = 0–15.5 s): `~/Desktop/DIGITALIZA/render-clip5/frames/f_XXXX.jpg` sul Mac, fuori dal repo.
 - Livello HyperFrames già renderizzato (WebM con alfa, 20 s): `~/Desktop/DIGITALIZA/render-clip5/overlay-hf.webm`.
-- Il primo render a piena potenza è stato fermato a 168 fotogrammi perché il Mac scaldava troppo. È ripartito in modalità leggera dal 169.
+- Fotogrammi validi: 1–466 su 930 (pausa chiesta da fede il 2026-10-25 alle 02:04). Il primo render a piena potenza si era fermato a 168 perché il Mac scaldava; poi è ripartito in modalità leggera.
 
 ## Riprendere
 ```
