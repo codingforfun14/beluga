@@ -53,7 +53,8 @@ def lathe(name, profile, segments=128):
     return obj
 
 
-def superellipsoid(name, rx, ry, rz, e1=0.55, e2=0.9, seg=160, rings=96):
+def superellipsoid(name, rx, ry, rz, e1=0.55, e2=0.9, seg=160, rings=96,
+                   vmin=-math.pi / 2, vmax=math.pi / 2):
     """Ciottolo morbido: e1 schiaccia i poli, e2 arrotonda la sezione."""
     def sgnpow(x, p):
         return math.copysign(abs(x) ** p, x)
@@ -62,7 +63,7 @@ def superellipsoid(name, rx, ry, rz, e1=0.55, e2=0.9, seg=160, rings=96):
     bm = bmesh.new()
     grid = []
     for i in range(rings + 1):
-        v = -math.pi / 2 + math.pi * i / rings
+        v = vmin + (vmax - vmin) * i / rings
         row = []
         for j in range(seg):
             u = -math.pi + 2 * math.pi * j / seg
@@ -135,6 +136,39 @@ def parent(child, par):
 # ------------------------------------------------------------------ modello
 # Unita': metri. L'auricolare e' lungo circa 2.2 cm.
 
+def build_bud_cap(mats, name="cap"):
+    """Faccia touch, anello e logo: il 'tappo' che si stacca nell'esploso."""
+    # Faccia touch: disco di vetro nero con bordo arrotondato.
+    face_profile = [(0.0, 0.0071), (0.0062, 0.0071), (0.0066, 0.00705),
+                    (0.0068, 0.00690), (0.0068, 0.0060)]
+    face = lathe(name + "_touch", face_profile)
+    face.location.z = 0.0003
+    assign(face, mats["glass"])
+
+    # Anello metallico color rame attorno alla faccia.
+    ring_profile = [(0.0068, 0.0058), (0.0068, 0.0072), (0.00705, 0.00745),
+                    (0.0074, 0.00745), (0.00765, 0.0072), (0.0077, 0.0064),
+                    (0.0077, 0.0058)]
+    ring = lathe(name + "_ring", ring_profile)
+    ring.location.z = 0.0003
+    assign(ring, mats["metal"])
+
+    # Logo inciso sulla faccia.
+    curve = bpy.data.curves.new(name + "_logo", "FONT")
+    curve.body = "ORBO"
+    curve.align_x = "CENTER"
+    curve.align_y = "CENTER"
+    curve.size = 0.0021
+    curve.space_character = 1.35
+    curve.extrude = 0.00002
+    logo = bpy.data.objects.new(name + "_logo", curve)
+    bpy.context.collection.objects.link(logo)
+    logo.location = (0, 0, 0.00742)
+    assign(logo, mats["metal"])
+
+    return [face, ring, logo]
+
+
 def build_bud(name="ORBO_bud", mats=None):
     root = bpy.data.objects.new(name, None)
     bpy.context.collection.objects.link(root)
@@ -145,22 +179,8 @@ def build_bud(name="ORBO_bud", mats=None):
     assign(shell, mats["shell"])
     parent(shell, root)
 
-    # Faccia touch: disco di vetro nero con bordo arrotondato.
-    face_profile = [(0.0, 0.0071), (0.0062, 0.0071), (0.0066, 0.00705),
-                    (0.0068, 0.00690), (0.0068, 0.0060)]
-    face = lathe(name + "_touch", face_profile)
-    face.location.z = 0.0003
-    assign(face, mats["glass"])
-    parent(face, root)
-
-    # Anello metallico color rame attorno alla faccia.
-    ring_profile = [(0.0068, 0.0058), (0.0068, 0.0072), (0.00705, 0.00745),
-                    (0.0074, 0.00745), (0.00765, 0.0072), (0.0077, 0.0064),
-                    (0.0077, 0.0058)]
-    ring = lathe(name + "_ring", ring_profile)
-    ring.location.z = 0.0003
-    assign(ring, mats["metal"])
-    parent(ring, root)
+    for obj in build_bud_cap(mats, name):
+        parent(obj, root)
 
     # Becco verso il condotto uditivo, inclinato.
     nozzle_profile = [(0.0, -0.0105), (0.0024, -0.0105), (0.0027, -0.0102),
@@ -190,20 +210,6 @@ def build_bud(name="ORBO_bud", mats=None):
     mic.rotation_euler = (0, math.radians(68), 0)
     assign(mic, mats["grille"])
     parent(mic, root)
-
-    # Logo inciso sulla faccia.
-    curve = bpy.data.curves.new(name + "_logo", "FONT")
-    curve.body = "ORBO"
-    curve.align_x = "CENTER"
-    curve.align_y = "CENTER"
-    curve.size = 0.0021
-    curve.space_character = 1.35
-    curve.extrude = 0.00002
-    logo = bpy.data.objects.new(name + "_logo", curve)
-    bpy.context.collection.objects.link(logo)
-    logo.location = (0, 0, 0.00742)
-    assign(logo, mats["metal"])
-    parent(logo, root)
 
     return root
 
