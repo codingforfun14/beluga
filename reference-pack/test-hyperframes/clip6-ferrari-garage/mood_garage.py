@@ -187,6 +187,27 @@ sc.render.resolution_x, sc.render.resolution_y = 1920, 1080
 sc.render.image_settings.file_format = 'JPEG'; sc.render.image_settings.quality = 92
 sc.frame_set(90)
 
+if len(argv) > 3 and argv[3] == 'reveal':
+    # 3) rivelazione: la 488 al posto della sagoma, telo a terra dietro, tutti i neon accesi
+    import os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import car488
+    body.hide_render = True
+    for o in sc.objects:
+        if o.name.startswith('ruota'): o.hide_render = True
+    cloth.hide_render = True
+    car = car488.load(os.path.expanduser('~/Desktop/DIGITALIZA/render-clip6/modello/ferrari_488_gtb.glb'))
+    car.rotation_euler = (0, 0, 0)
+    for t_ in tubes: t_.data.materials[0].node_tree.nodes['Principled BSDF'].inputs['Emission Strength'].default_value = 4.0
+    for x in (-2.0, 2.0):
+        for y in (-3.5, 0.0, 3.5):
+            l = bpy.data.lights.new('neon', 'AREA'); l.shape = 'RECTANGLE'; l.size = 0.1; l.size_y = 1.5; l.energy = 120; l.color = (0.85, 0.92, 1.0)
+            lo_ = bpy.data.objects.new('neon', l); sc.collection.objects.link(lo_); lo_.location = (x, y, H - 0.25)
+    drone.location = (-1.6, -1.0, 2.6); drone.rotation_euler = (math.radians(25), 0, math.radians(-30))
+    sc.camera = cam('C3_rivela', (3.4, 3.9, 0.55), (0.0, 0.2, 0.55), 30, 2.8, 5.0)
+    sc.render.filepath = f'{out}03_rivelazione.jpg'; bpy.ops.render.render(write_still=True)
+    sc.camera = cam('C4_lato', (-3.0, -3.9, 0.8), (0.2, 0.3, 0.55), 30, 2.8, 4.8)
+    sc.render.filepath = f'{out}04_eroe.jpg'; bpy.ops.render.render(write_still=True)
+    raise SystemExit
 # 1) il drone entra da sotto la saracinesca, controluce; l'auto coperta in primo piano
 drone.location = (0.9, L / 2 - 1.0, 1.0); drone.rotation_euler = (math.radians(-8), 0, math.radians(180))
 sc.camera = cam('C1_ingresso', (1.9, -4.2, 0.6), (-0.9, L / 2, 0.9), 24, 2.8, 9.5)
