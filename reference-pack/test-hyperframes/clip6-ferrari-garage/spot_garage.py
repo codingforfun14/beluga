@@ -403,8 +403,12 @@ sc.render.use_overwrite = False; sc.render.use_placeholder = True
 # salva e calcola il telo in cache su disco (serve un .blend salvato)
 blend = os.path.join(WORK, 'spot_garage.blend')
 bpy.ops.wm.save_as_mainfile(filepath=blend)
-cm.point_cache.use_disk_cache = True
-with bpy.context.temp_override(scene=sc, point_cache=cm.point_cache):
-    bpy.ops.ptcache.bake(bake=True)
+if FINO < 12.5:
+    # prima del tiro (12.5 s) il telo e' fermo sull'auto: niente simulazione, resta la forma gia' appoggiata (risparmia ~9 min)
+    cloth.modifiers.remove(cm)
+else:
+    cm.point_cache.use_disk_cache = True
+    with bpy.context.temp_override(scene=sc, point_cache=cm.point_cache):
+        bpy.ops.ptcache.bake(bake=True)
 bpy.ops.wm.save_as_mainfile(filepath=blend)
 print('SALVATO', blend)

@@ -11,4 +11,4 @@ nice -n 19 ~/Applications/Blender.app/Contents/MacOS/Blender -b --factory-startu
 PARTIAL=$PWD/progress/scena1.mp4 PARTIAL_GIT=1 ./render_blocchi.sh $W/spot_garage.blend $W 1 180 30 150
 ```
 
-Il primo comando prepara la scena e calcola il telo solo fino al fotogramma 180. Il secondo renderizza 2 blocchi (1-100, 101-180) e aggiorna `progress/scena1.mp4` dopo ogni blocco. Spazio: meno di 100 MB.
+Il primo comando prepara la scena (circa 3 minuti). Con 6 secondi il telo non viene simulato: prima del tiro a 12.5 s è fermo sull'auto, quindi resta la forma già appoggiata. Il secondo renderizza 2 blocchi (1-100, 101-180) e aggiorna `progress/scena1.mp4` dopo ogni blocco. Spazio: meno di 100 MB.
