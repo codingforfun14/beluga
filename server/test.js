@@ -111,7 +111,7 @@ async function test(name, fn) {
 
   await test('Chi lavora: Fede assegna l\'Ideatore, ruoli e programmi non previsti rifiutati', async () => {
     const st = (await get('/api/stato')).body;
-    assert.deepStrictEqual(st.assegnabili.ideatore, ['claude', 'codex']);
+    assert.deepStrictEqual(st.assegnabili.ideatore, ['manuale', 'claude', 'codex']);
     assert.ok(st.programmi.codex, 'codex deve comparire anche se non assegnato');
     const prima = JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.json'), 'utf8'));
     const a = await post('/api/ruoli', { ruolo: 'ideatore', programma: 'codex' });
@@ -130,6 +130,25 @@ async function test(name, fn) {
     assert.strictEqual(b.body.temporaneo, true);
     loc = JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.locale.json'), 'utf8'));
     assert.strictEqual(loc.ruoli.ideatore.programma, 'claude');
+  });
+
+  await test('Solo prompt: Ideatore "a mano", nessun programma avviato, la risposta incollata viene salvata', async () => {
+    assert.strictEqual((await post('/api/ruoli', { ruolo: 'ideatore', programma: 'manuale' })).body.temporaneo, false);
+    const id = (await post('/api/messaggi', { testo: 'proponi tre idee per un reel di mezzeuro sul budget mensile' })).body.task;
+    const t = await until(id, ['attesa_risposta']);
+    assert.strictEqual(t.agente.programma, 'manuale');
+    assert.ok(fs.existsSync(path.join(ROOT, 'projects/mezzeuro/work', id, 'v01', 'prompt.md')));
+    assert.match((await get(`/api/lavori/${id}/piano-b`)).body.prompt, /budget mensile/);
+    assert.ok(!fs.existsSync(path.join(ROOT, 'projects/mezzeuro/work', id, 'v01', 'risposta-agente.txt')), 'nessun agente deve aver risposto');
+    const idea = n => ({ titolo: `M${n}`, hook: `H${n}`, sviluppo: `S${n}`, direzione_visiva: `V${n}` });
+    const ok = await post(`/api/lavori/${id}/manuale`, { testo: JSON.stringify({ idee: [idea(1), idea(2), idea(3)] }) });
+    assert.strictEqual(ok.body.task.stato, 'attesa_fede');
+    const md = await post(`/api/lavori/${id}/modifica`, { testo: 'Più brevi' });
+    assert.strictEqual(md.body.task.versione, 2);
+    const t2 = await until(id, ['attesa_risposta']);
+    assert.match((await get(`/api/lavori/${id}/piano-b`)).body.prompt, /Più brevi/);
+    assert.strictEqual(t2.versione, 2);
+    await post('/api/ruoli', { ruolo: 'ideatore', programma: 'claude' });
   });
 
   // 3. Riavvio: incarico e risultato restano. Poi un incarico interrotto a metà.
