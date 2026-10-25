@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080712">
+<meta name="description" content="Niko, il socio creativo di Fede. Chat, incarichi, anteprime e calendario del progetto BELUGA.">
+<title>Niko</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 4h16v12H9l-5 4z"/><path d="M8 8h8M8 12h5"/></symbol>
+  <symbol id="i-tasks" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3 6 1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 11h18"/></symbol>
+  <symbol id="i-team" viewBox="0 0 24 24"><path d="M9 3h6v5H9zM3 16h6v5H3zM15 16h6v5h-6zM12 8v4M6 16v-4h12v4"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+  <symbol id="i-cube" viewBox="0 0 24 24"><path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10"/></symbol>
+  <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+</svg>
+
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="logo">n</span>NIKO<span class="cursor">_</span></div>
+    <p class="brandsub">Progetto BELUGA</p>
+    <nav class="nav" aria-label="Navigazione principale">
+      <button data-view="chat" class="active"><svg><use href="#i-chat"/></svg><span>Chat</span></button>
+      <button data-view="tasks"><svg><use href="#i-tasks"/></svg><span>Incarichi</span><b class="count" id="count-tasks"></b></button>
+      <button data-view="previews"><svg><use href="#i-eye"/></svg><span>Anteprime</span><b class="count hot" id="count-previews"></b></button>
+      <button data-view="calendar"><svg><use href="#i-calendar"/></svg><span>Calendario</span></button>
+      <button data-view="team"><svg><use href="#i-team"/></svg><span>Squadra</span></button>
+    </nav>
+    <div class="links">
+      <div class="eyebrow">COLLEGAMENTI</div>
+      <ul id="connections"></ul>
+    </div>
+    <div class="sidebottom">
+      <div class="profile"><span class="avatar">F</span><div>Fede<small>Direzione creativa</small></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="menu" id="menubtn" aria-label="Apri menu"><svg><use href="#i-menu"/></svg></button>
+      <div class="crumb">NIKO <span>/ <b id="crumb">chat</b></span></div>
+      <span class="demo" title="Questa pagina usa dati di esempio: nessun agente viene avviato">ANTEPRIMA UI · DATI DI ESEMPIO</span>
+    </header>
+
+    <div class="body">
+      <section class="view active" id="view-chat" aria-label="Chat con Niko">
+        <div class="feed" id="feed">
+          <div class="hello">
+            <div class="boot"><span class="dot"></span>CANALE PERSONALE</div>
+            <h1>Fede, ti ricevo.<br><span>Che cosa creiamo?</span></h1>
+          </div>
+          <div id="messages" aria-live="polite"></div>
+        </div>
+        <form class="composer" id="composer">
+          <div class="modes" role="radiogroup" aria-label="Tipo di richiesta">
+            <button type="button" role="radio" aria-checked="true" data-mode="auto">Niko sceglie</button>
+            <button type="button" role="radio" aria-checked="false" data-mode="idee"><svg><use href="#i-spark"/></svg>Idee</button>
+            <button type="button" role="radio" aria-checked="false" data-mode="blender"><svg><use href="#i-cube"/></svg>Video Blender</button>
+            <button type="button" role="radio" aria-checked="false" data-mode="hyperframes"><svg><use href="#i-film"/></svg>Video HyperFrames</button>
+            <label class="project">Progetto
+              <select id="project">
+                <option value="mezzeuro">mezzeuro</option>
+                <option value="motion">Libreria motion</option>
+                <option value="ferrari">Ferrari 488 (in pausa)</option>
+              </select>
+            </label>
+          </div>
+          <label for="prompt" class="sr">Messaggio per Niko</label>
+          <textarea id="prompt" rows="2" maxlength="4000" placeholder="Parla con Niko. Che cosa creiamo?"></textarea>
+          <div class="composerfoot">
+            <span class="hint">Invio per mandare · Maiusc + Invio per andare a capo</span>
+            <button class="send" type="submit">Invia <svg><use href="#i-arrow"/></svg></button>
+          </div>
+        </form>
+      </section>
+
+      <section class="view" id="view-tasks" aria-label="Incarichi">
+        <div class="viewhead"><div class="eyebrow">CODA DEGLI INCARICHI</div><h2>Cosa sta succedendo</h2><p>Ogni richiesta diventa un incarico con uno stato vero. Un incarico è fatto solo quando il file esiste e ha passato il controllo.</p></div>
+        <div class="filters" id="taskfilters"></div>
+        <div class="tasklist" id="tasklist"></div>
+      </section>
+
+      <section class="view" id="view-previews" aria-label="Anteprime">
+        <div class="viewhead"><div class="eyebrow">DA GUARDARE</div><h2>Anteprime</h2><p>Qui arrivano bozze, animatic e render di prova. Il render finale parte solo dopo il tuo ok.</p></div>
+        <div class="previewgrid" id="previewgrid"></div>
+      </section>
+
+      <section class="view" id="view-calendar" aria-label="Calendario">
+        <div class="viewhead"><div class="eyebrow">CALENDARIO</div><h2 id="monthlabel"></h2><p>Uscite di mezzeuro, revisioni e controlli del piano. Un render in calendario non parte da solo.</p></div>
+        <div class="calbar"><button class="ghost" id="prevmonth" aria-label="Mese precedente">←</button><button class="ghost" id="thismonth">Oggi</button><button class="ghost" id="nextmonth" aria-label="Mese successivo">→</button></div>
+        <div class="calendar" id="calendar"></div>
+      </section>
+
+      <section class="view" id="view-team" aria-label="Squadra">
+        <div class="viewhead"><div class="eyebrow">LA SQUADRA</div><h2>Niko e tre agenti</h2><p>Niko parla con te e smista. Gli agenti lavorano sul tuo Mac con i tuoi abbonamenti, seguendo le loro skill.</p></div>
+        <div class="teamgrid" id="teamgrid"></div>
+      </section>
+
+      <aside class="niko" aria-label="Niko">
+        <div class="nikoart">
+          <img src="assets/niko-buddy.webp" alt="Niko, robot olografico con cappellino, cuffie e giacca viola" width="1024" height="1536">
+          <div class="scan" aria-hidden="true"></div>
+          <div class="nikoname"><span class="eyebrow">IL TUO SOCIO</span><strong>NIKO<span>_</span></strong></div>
+        </div>
+        <div class="nikostate">
+          <span class="pulse" id="nikopulse"></span>
+          <div><strong id="nikostatus">Sto lavorando a 2 incarichi</strong><small id="nikosub">1 anteprima aspetta il tuo ok</small></div>
+        </div>
+        <div class="now" id="now"></div>
+      </aside>
+    </div>
+  </main>
+
+  <nav class="tabbar" aria-label="Navigazione">
+    <button data-view="chat" class="active"><svg><use href="#i-chat"/></svg>Chat</button>
+    <button data-view="tasks"><svg><use href="#i-tasks"/></svg>Incarichi</button>
+    <button data-view="previews"><svg><use href="#i-eye"/></svg>Anteprime</button>
+    <button data-view="calendar"><svg><use href="#i-calendar"/></svg>Calendario</button>
+    <button data-view="team"><svg><use href="#i-team"/></svg>Squadra</button>
+  </nav>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
