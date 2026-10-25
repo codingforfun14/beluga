@@ -15,6 +15,7 @@ ASSET = os.path.expanduser('~/Desktop/DIGITALIZA/render-clip6/asset')
 GLB = os.path.join(HERE, 'modello', 'ferrari_488_gtb.glb')
 sys.path.insert(0, HERE)
 import car488
+import garage_v2 as g2
 random.seed(4)
 os.makedirs(WORK, exist_ok=True)
 bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -69,13 +70,16 @@ def visible(o, f_on=None, f_off=None):
     if f_on: o.hide_render = False; o.keyframe_insert('hide_render', frame=f_on)
     if f_off: o.hide_render = True; o.keyframe_insert('hide_render', frame=f_off)
 
-m_floor = pbr('pavimento_garage', 'garage_floor', 2.5, 0.6, 0.55)
-m_wall = pbr('blocchi', 'concrete_block_wall', 2.0, 0.55)
+m_floor = g2.floor_material(ASSET)   # v2: cemento 4K con giunti, gomme, olio, pozze
+m_asphalt = pbr('asfalto', 'garage_floor', 2.5, 0.45, 0.8)
+m_wood = mat('legno_banco', (0.22, 0.15, 0.09), 0.6)
+m_wall = pbr('blocchi', 'concrete_block_wall', 2.0, 0.32)
+m_ceil = mat('soffitto', (0.035, 0.035, 0.037), 0.85)
 m_door = pbr('saracinesca', 'corrugated_iron_02', 1.5, 0.7)
-m_metal = mat('metallo', (0.25, 0.25, 0.26), 0.35, metal=1.0)
+m_metal = mat('metallo', (0.2, 0.2, 0.21), 0.6, metal=0.6)   # acciaio opaco: non specchia la saracinesca
 m_day = mat('esterno', (1, 1, 1), 1.0, emit=(1.0, 0.93, 0.85), estr=8.0)
-m_tube = mat('neon', (0.25, 0.25, 0.27), 0.3, emit=(0.85, 0.92, 1.0), estr=0.0)   # spento: grigio, non bianco
-m_cloth = mat('telo', (0.09, 0.09, 0.1), 0.85)
+m_tube = mat('neon', (0.08, 0.08, 0.085), 0.5, emit=(0.85, 0.92, 1.0), estr=0.0)   # spento: scuro, non bianco
+m_cloth = g2.cloth_material(ASSET)   # v2: trama di tessuto e polvere
 m_tire = mat('gomma', (0.02, 0.02, 0.02), 0.7)
 m_cab = mat('cassettiera', (0.12, 0.12, 0.13), 0.4, metal=0.6)
 m_drone = mat('drone', (0.02, 0.02, 0.022), 0.4)
@@ -83,16 +87,13 @@ m_led_g = mat('led_verde', (0, 0, 0), 0.5, emit=(0.1, 1, 0.2), estr=20)
 m_led_r = mat('led_rosso', (0, 0, 0), 0.5, emit=(1, 0.05, 0.03), estr=20)
 m_led_w = mat('led_bianco', (0, 0, 0), 0.5, emit=(1, 1, 1), estr=40)
 
-w = bpy.data.worlds.new('w'); sc.world = w; w.use_nodes = True
-wn = w.node_tree; bgn = wn.nodes['Background']
-env = wn.nodes.new('ShaderNodeTexEnvironment'); env.image = bpy.data.images.load(ASSET + '/hdri/abandoned_garage_2k.exr')
-wn.links.new(env.outputs['Color'], bgn.inputs['Color']); bgn.inputs['Strength'].default_value = 0.03
+g2.world(sc, ASSET)   # v2: fuori dalla saracinesca si vede un cortile industriale vero (HDRI)
 
 # ------------------------------------------------------------------ garage 8 x 12 m, saracinesca sul fondo (y = +6)
 W, L, H = 8.0, 12.0, 4.0
 floor = box('pavimento', (0, 0, -0.05), (W + 4, L + 4, 0.1), m_floor)
 box('muro_sx', (-W / 2, 0, H / 2), (0.2, L, H), m_wall); box('muro_dx', (W / 2, 0, H / 2), (0.2, L, H), m_wall)
-box('muro_dietro', (0, -L / 2, H / 2), (W, 0.2, H), m_wall); box('soffitto', (0, 0, H), (W, L, 0.2), m_wall)
+box('muro_dietro', (0, -L / 2, H / 2), (W, 0.2, H), m_wall); box('soffitto', (0, 0, H), (W, L, 0.2), m_ceil)
 DW, DH, OPEN = 4.6, 3.0, 1.3
 box('fondo_sx', (-(W + DW) / 4, L / 2, H / 2), ((W - DW) / 2, 0.2, H), m_wall)
 box('fondo_dx', ((W + DW) / 4, L / 2, H / 2), ((W - DW) / 2, 0.2, H), m_wall)
@@ -102,11 +103,14 @@ for i in range(int(DH / 0.1)):
     s_ = box('lamella', (0, L / 2 - 0.05, 0.05 + i * 0.1), (DW, 0.04, 0.1), m_door); s_.parent = door
 # saracinesca: chiusa, si alza di 1.3 m tra 0.4 e 3.0 s (le lamelle in alto spariscono dentro l'architrave)
 keyval(door, 'location', [(1, Vector((0, 0, 0))), (F(0.4), Vector((0, 0, 0))), (F(3.0), Vector((0, 0, OPEN)))])
-ext = box('esterno', (0, L / 2 + 4, 1.5), (14, 0.1, 6), m_day); ext.visible_shadow = False
-box('asfalto_fuori', (0, L / 2 + 2, -0.04), (10, 4, 0.05), m_floor)
+box('asfalto_fuori', (0, L / 2 + 12, -0.04), (40, 24, 0.05), m_asphalt)
+dl = bpy.data.lights.new('luce_porta', 'AREA'); dl.shape = 'RECTANGLE'; dl.size = DW; dl.size_y = 1.0; dl.energy = 0
+dl.color = (1.0, 0.88, 0.72)   # luce calda del giorno che entra dalla fessura
+dlo = link(bpy.data.objects.new('luce_porta', dl)); dlo.location = (0, L / 2 + 0.3, 0.6); dlo.rotation_euler = (math.radians(-90), 0, 0)
+keyval(dl, 'energy', [(1, 0), (F(0.4), 0), (F(3.0), 350)])
 sun = bpy.data.lights.new('sole', 'SUN'); sun.energy = 6; sun.color = (1, 0.9, 0.78); sun.angle = math.radians(0.8)
 so = link(bpy.data.objects.new('sole', sun)); so.rotation_euler = Vector((0.2, -0.93, -0.3)).to_track_quat('-Z', 'Y').to_euler()
-amb = bpy.data.lights.new('ambiente', 'AREA'); amb.energy = 30; amb.size = 6; amb.color = (0.75, 0.82, 1.0); amb.use_shadow = False
+amb = bpy.data.lights.new('ambiente', 'AREA'); amb.energy = 6; amb.size = 6; amb.color = (0.75, 0.82, 1.0); amb.use_shadow = False
 ao = link(bpy.data.objects.new('ambiente', amb)); ao.location = (0, -2, H - 0.3)
 
 tubes, tube_lights = [], []
@@ -127,14 +131,8 @@ def neon_on(i, t0, flicker=True):
 neon_on(2, 7.5)
 for k, i in enumerate([1, 4, 0, 3, 5]):
     neon_on(i, 15.25 + 0.22 * k)
-# oggetti del garage
-box('cassettiera', (-W / 2 + 0.45, -2.5, 0.55), (0.6, 1.4, 1.1), m_cab)
-for k in range(5):
-    bpy.ops.mesh.primitive_torus_add(major_radius=0.3, minor_radius=0.12, location=(W / 2 - 0.6, -3.8, 0.12 + k * 0.24))
-    bpy.context.object.data.materials.append(m_tire)
-for z in (0.5, 1.3, 2.1):
-    box('ripiano', (W / 2 - 0.35, 1.5, z), (0.5, 2.4, 0.04), m_metal)
-    for k in range(6): box('scatola', (W / 2 - 0.35, 0.5 + k * 0.38, z + 0.15), (0.4, 0.3, 0.26), m_wall)
+# oggetti del garage (v2: modelli CC0 di Poly Haven)
+g2.props(ASSET, W, L, H, box, m_metal, m_wood)
 
 # ------------------------------------------------------------------ la 488 (muso verso -Y, coda verso la saracinesca)
 car = car488.load(GLB)
@@ -265,7 +263,7 @@ if FINAL:
     bpy.ops.mesh.primitive_cube_add(size=1, location=(0, 0, H / 2)); fog = bpy.context.object
     fog.scale = (W, L + 6, H); fm = bpy.data.materials.new('nebbia'); fm.use_nodes = True; fog.data.materials.append(fm)
     nt = fm.node_tree; nt.nodes.remove(nt.nodes['Principled BSDF'])
-    pv = nt.nodes.new('ShaderNodeVolumePrincipled'); pv.inputs['Density'].default_value = 0.05
+    pv = nt.nodes.new('ShaderNodeVolumePrincipled'); pv.inputs['Density'].default_value = 0.015
     nt.links.new(pv.outputs[0], nt.nodes['Material Output'].inputs['Volume'])
 sw = bpy.data.lights.new('striscia', 'AREA'); sw.shape = 'RECTANGLE'; sw.size = 3.0; sw.size_y = 0.15; sw.energy = 0
 swo = link(bpy.data.objects.new('striscia', sw)); swo.rotation_euler = (0, 0, 0)
