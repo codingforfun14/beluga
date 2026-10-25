@@ -420,7 +420,7 @@ sc.camera = c1
 # ------------------------------------------------------------------ render
 sc.render.engine = 'BLENDER_EEVEE'
 e = sc.eevee
-settings = [('taa_render_samples', 48 if FINAL else 8), ('use_shadows', True), ('use_raytracing', FINAL),
+settings = [('taa_render_samples', 24 if FINAL else 8), ('use_shadows', True), ('use_raytracing', FINAL),
             ('volumetric_tile_size', '8'), ('volumetric_samples', 64), ('use_volumetric_shadows', FINAL)]
 for attr, val in settings:
     if hasattr(e, attr):
