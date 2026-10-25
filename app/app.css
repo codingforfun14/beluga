@@ -3,7 +3,7 @@
 @font-face{font-family:'Space Grotesk';src:url(fonts/space-grotesk-latin-600-normal.woff2) format('woff2');font-weight:600;font-display:swap}
 @font-face{font-family:'Space Grotesk';src:url(fonts/space-grotesk-latin-700-normal.woff2) format('woff2');font-weight:700;font-display:swap}
 
-:root{
+:root{color-scheme:dark;
   --bg:#080712;--panel:#12101f;--panel2:#171126;--line:#2d2440;--line2:#43304e;
   --text:#eeebfa;--soft:#c8bcd6;--muted:#9a87ab;--faint:#6f5f80;
   --cyan:#8ef8ff;--violet:#b892ff;--pink:#ef8cdd;--amber:#f2b77c;--green:#86f0b4;--red:#ff8a9a;
