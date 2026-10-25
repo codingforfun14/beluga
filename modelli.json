@@ -1,0 +1,13 @@
+{
+  "nota": "Quale programma usa ogni ruolo. Si cambia qui, una riga per ruolo. Niente API: solo i programmi ufficiali con gli account di Fede.",
+  "programmi": {
+    "claude": { "percorso": "claude", "comando": "claude -p" },
+    "codex": { "percorso": "codex", "comando": "codex exec" }
+  },
+  "ruoli": {
+    "niko": { "programma": null, "nota": "In questa fase Niko smista le richieste con regole semplici, senza chiamare un modello." },
+    "ideatore": { "programma": "claude", "temporaneo": true, "definitivo": "codex", "nota": "Claude fa l'Ideatore solo per provare il collegamento. Il definitivo è Codex, quando sarà verificato con l'account della scuola." },
+    "revisore": { "programma": null, "nota": "Non attivo in questa fase. Sarà il modello diverso da chi ha scritto." },
+    "produzione": { "programma": null, "nota": "Non attiva in questa fase: niente Blender né render. Sarà Claude." }
+  }
+}

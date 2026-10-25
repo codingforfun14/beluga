@@ -8,7 +8,10 @@ const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const vnum = n => 'versione ' + String(n).padStart(2, '0');
 const vtag = n => 'v' + String(n).padStart(2, '0');
 
-const db = structuredClone(demo);
+// Modalità reale quando l'app è aperta dal servizio locale (http://127.0.0.1:4170).
+// Con il doppio clic sul file resta la demo con i dati di esempio: le due cose non si mescolano.
+const REAL = /^https?:$/.test(location.protocol);
+const db = REAL ? { tasks: [], deliveries: [], messages: [], links: [], library: [], events: demo.events } : structuredClone(demo);
 const task = id => db.tasks.find(t => t.id === id);
 const delivery = id => db.deliveries.find(d => d.id === id);
 let kind = null;
@@ -87,7 +90,7 @@ function body(t) {
 
 function card(t) {
   return `<article class="card s-${t.state}" data-task="${t.id}">
-    <div class="cardtop"><span class="kind">${icon(KIND[t.kind].icon)}${KIND[t.kind].label} · ${esc(PROJECT[t.project])}${t.version ? `<b class="ver">${vtag(t.version)}</b>` : ''}</span><span class="state">${STATE[t.state]}</span></div>
+    <div class="cardtop"><span class="kind">${icon(KIND[t.kind].icon)}${KIND[t.kind].label} · ${esc(PROJECT[t.project])}${t.version ? `<b class="ver">${vtag(t.version)}</b>` : ''}</span><span class="state">${t.stateLabel || STATE[t.state]}</span></div>
     <h3>${esc(t.title)}</h3>
     <p class="status">${esc(t.status)}</p>
     ${tracker(t)}
@@ -221,7 +224,7 @@ function renderConsegne() {
 /* ---------- libreria ---------- */
 
 const SAVE = 'niko-libreria-v1';
-try { const saved = JSON.parse(localStorage.getItem(SAVE)); if (Array.isArray(saved)) db.library = saved; } catch {}
+if (!REAL) { try { const saved = JSON.parse(localStorage.getItem(SAVE)); if (Array.isArray(saved)) db.library = saved; } catch {} }
 const saveLibrary = () => { try { localStorage.setItem(SAVE, JSON.stringify(db.library)); } catch {} };
 
 function libItem(it, i) {
