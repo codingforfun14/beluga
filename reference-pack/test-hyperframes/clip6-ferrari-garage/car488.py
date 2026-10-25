@@ -53,12 +53,15 @@ def load(path):
     pivot = bpy.data.objects.new('car_pivot', None); sc.collection.objects.link(pivot)
     root.parent = pivot; root.location = (-c.x, -c.y, -mn.z)
     # materiali
+    hidden_mats = set()
     for m in {m for o in meshes for m in o.data.materials if m}:
         if not m.use_nodes: continue
         p = m.node_tree.nodes.get('Principled BSDF')
         if p is None: continue
         bc = p.inputs['Base Color'].default_value; a = p.inputs['Alpha'].default_value
         if m.name == 'body1': paint(m)
+        elif a < 0.05:   # superfici di servizio invisibili nel glb (material_48): restano invisibili
+            hidden_mats.add(m.name)
         elif a < 0.6 and m.name not in ('Color_A08',): glass(m)
         elif m.name == 'Color_A08':   # fanali posteriori rossi traslucidi
             p.inputs['Emission Color'].default_value = (1, 0.02, 0.01, 1); p.inputs['Emission Strength'].default_value = 0.0
@@ -71,6 +74,7 @@ def load(path):
         elif tuple(round(x, 2) for x in bc[:3]) == (1.0, 1.0, 1.0): satin(m, 0.03, 0.4)   # parti bianche SketchUp = plastiche/carbonio
         else: p.inputs['Roughness'].default_value = min(p.inputs['Roughness'].default_value, 0.5)
     for o in meshes:
+        if any(m and m.name in hidden_mats for m in o.data.materials): o.hide_render = True; o.hide_viewport = True; continue
         if len(o.data.polygons) == 0: o.hide_render = True; o.hide_viewport = True; continue
         for poly in o.data.polygons: poly.use_smooth = True
         mod = o.modifiers.new('smooth', 'NODES')
