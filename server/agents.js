@@ -8,9 +8,12 @@ const path = require('path');
 const LIMIT = 2 * 1024 * 1024;
 const ROOT = path.resolve(process.env.BELUGA_ROOT || path.join(__dirname, '..'));
 // Percorso del programma: da modelli.json ("programmi") se indicato, altrimenti il nome nel PATH.
-function bin(name) {
-  try { const c = JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.json'), 'utf8')); return (c.programmi && c.programmi[name] && c.programmi[name].percorso) || name; } catch { return name; }
+function conf(name) {
+  try { const c = JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.json'), 'utf8')); return (c.programmi && c.programmi[name]) || {}; } catch { return {}; }
 }
+const bin = name => conf(name).percorso || name;
+// Modello scelto in modelli.json solo per le chiamate di Niko: il config personale del programma resta com'è.
+const model = name => { const m = conf(name).modello; return typeof m === 'string' && /^[A-Za-z0-9._:-]{1,64}$/.test(m) ? m : null; };
 const TIMEOUT = Number(process.env.BELUGA_TIMEOUT_MS) || 6 * 60 * 1000;
 
 function run(bin, args, { input = '', cwd, timeout = TIMEOUT } = {}) {
@@ -80,6 +83,7 @@ const codex = {
     if (h.includes('--skip-git-repo-check')) args.push('--skip-git-repo-check');
     if (h.includes('--sandbox')) args.push('--sandbox', 'read-only');
     if (h.includes('--color')) args.push('--color', 'never');
+    if (model('codex') && h.includes('--model')) args.push('--model', model('codex'));
     const useLast = h.includes('--output-last-message');
     if (useLast) args.push('--output-last-message', last);
     args.push('-'); // il prompt arriva da stdin

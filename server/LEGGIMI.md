@@ -46,3 +46,8 @@ Usano un agente finto in una cartella temporanea: non toccano i tuoi incarichi e
 - Il Revisore non è ancora attivo. Il "Controllo" che vedi nelle schede è il controllo automatico del formato: 3 idee, ognuna con titolo, hook, sviluppo e direzione visiva.
 - L'adattatore di Codex è scritto ma non è provato, perché Codex non è installato.
 - Un incarico alla volta. Non ci sono tentativi automatici: se un agente non risponde, l'incarico si ferma e puoi usare il piano B o "Riprova".
+
+## Modello di Codex
+Se Codex risponde che il modello "non è supportato con un account ChatGPT", in `modelli.json` aggiungi
+`"modello": "<nome>"` sotto `programmi.codex`. Niko lo passa con `--model` solo per le sue chiamate,
+senza cambiare il tuo `~/.codex/config.toml`. I modelli disponibili per il tuo account si vedono con `codex debug models`.
