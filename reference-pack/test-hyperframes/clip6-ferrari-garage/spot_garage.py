@@ -74,7 +74,7 @@ m_wall = pbr('blocchi', 'concrete_block_wall', 2.0, 0.55)
 m_door = pbr('saracinesca', 'corrugated_iron_02', 1.5, 0.7)
 m_metal = mat('metallo', (0.25, 0.25, 0.26), 0.35, metal=1.0)
 m_day = mat('esterno', (1, 1, 1), 1.0, emit=(1.0, 0.93, 0.85), estr=8.0)
-m_tube = mat('neon', (1, 1, 1), 0.3, emit=(0.85, 0.92, 1.0), estr=0.0)
+m_tube = mat('neon', (0.25, 0.25, 0.27), 0.3, emit=(0.85, 0.92, 1.0), estr=0.0)   # spento: grigio, non bianco
 m_cloth = mat('telo', (0.09, 0.09, 0.1), 0.85)
 m_tire = mat('gomma', (0.02, 0.02, 0.02), 0.7)
 m_cab = mat('cassettiera', (0.12, 0.12, 0.13), 0.4, metal=0.6)
@@ -140,24 +140,56 @@ for z in (0.5, 1.3, 2.1):
 car = car488.load(GLB)
 car_meshes = [o for o in car.children_recursive if o.type == 'MESH' and not o.hide_render]
 glass_objs = [o for o in car_meshes if any(m and m.surface_render_method == 'BLENDED' and m.name != 'Color_A08' for m in o.data.materials)]
-# collisore leggero per il telo: copia unita e decimata della carrozzeria
-bpy.ops.object.select_all(action='DESELECT')
-dup = []
+# collisore per il telo: sagoma CHIUSA ricavata dalle misure vere dell'auto (la carrozzeria del glb e' un guscio aperto
+# e il telo ci passava attraverso). Per ogni fetta lungo Y: altezza e larghezza massime, piu' 3 cm di margine.
+pts = []
 for o in car_meshes:
-    if len(o.data.polygons) < 50: continue
-    d = o.copy(); d.data = o.data.copy(); d.modifiers.clear(); link(d); d.parent = None; d.matrix_world = o.matrix_world.copy(); dup.append(d)
-for d in dup: d.select_set(True)
-bpy.context.view_layer.objects.active = dup[0]; bpy.ops.object.join(); col = bpy.context.object; col.name = 'collisore_auto'
-dec = col.modifiers.new('dec', 'DECIMATE'); dec.ratio = max(0.02, 15000 / len(col.data.polygons)); bpy.ops.object.modifier_apply(modifier='dec')
+    mw = o.matrix_world
+    for v in o.data.vertices: pts.append(mw @ v.co)
+ymin = min(p.y for p in pts); ymax = max(p.y for p in pts); NB = 36
+hb = [0.0] * NB; wb = [0.0] * NB
+mir = {1: [], -1: []}
+for p in pts:
+    i = min(NB - 1, int((p.y - ymin) / (ymax - ymin) * NB))
+    if abs(p.x) < 0.5: hb[i] = max(hb[i], p.z)
+    if abs(p.x) < 1.0 and p.z > 0.25: wb[i] = max(wb[i], abs(p.x))
+    if abs(p.x) >= 1.0 and p.z > 0.6: mir[1 if p.x > 0 else -1].append(p)
+for i in range(NB):   # niente buchi tra le fette
+    if hb[i] == 0: hb[i] = hb[i - 1] if i else 0.5
+    if wb[i] == 0: wb[i] = wb[i - 1] if i else 0.8
+bm = bmesh.new(); rings = []; NS = 20; M = 0.03
+for i in range(NB + 1):
+    y = ymin - M + (ymax - ymin + 2 * M) * i / NB; k = min(i, NB - 1)
+    h = hb[k] + M; wd = wb[k] + M; z0 = 0.14
+    ring = []
+    for j in range(NS):
+        a_ = j / NS * math.tau
+        cx, cz = math.cos(a_), math.sin(a_)
+        x = wd * math.copysign(abs(cx) ** 0.5, cx)                 # sezione "squadrata" tipo superellisse
+        z = z0 + (h - z0) * (0.5 + 0.5 * math.copysign(abs(cz) ** 0.6, cz))
+        ring.append(bm.verts.new((x, y, z)))
+    rings.append(ring)
+for r0, r1 in zip(rings, rings[1:]):
+    for j in range(NS): bm.faces.new((r0[j], r0[(j + 1) % NS], r1[(j + 1) % NS], r1[j]))
+bm.faces.new(list(reversed(rings[0]))); bm.faces.new(rings[-1])
+bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+me = bpy.data.meshes.new('collisore_auto'); bm.to_mesh(me); bm.free()
+col = link(bpy.data.objects.new('collisore_auto', me))
+for sgn, pp in mir.items():   # specchietti
+    if not pp: continue
+    lo_ = Vector((min(q.x for q in pp), min(q.y for q in pp), min(q.z for q in pp))); hi_ = Vector((max(q.x for q in pp), max(q.y for q in pp), max(q.z for q in pp)))
+    mb = box('collisore_specchio', (lo_ + hi_) / 2, (hi_ - lo_) + Vector((0.06, 0.06, 0.06)), m_cloth)
+    mb.hide_render = True; mb.display_type = 'WIRE'; mb.modifiers.new('c', 'COLLISION'); mb.collision.thickness_outer = 0.02
+CAR_H = max(hb)
 col.hide_render = True; col.display_type = 'WIRE'
 for o in (col, floor):
     o.modifiers.new('c', 'COLLISION'); o.collision.thickness_outer = 0.02
 
 # ------------------------------------------------------------------ telo: prima si appoggia (pre-roll), poi diventa la forma di partenza
-bpy.ops.mesh.primitive_grid_add(x_subdivisions=70, y_subdivisions=95, size=1, location=(0, 0, 1.55))
-cloth = bpy.context.object; cloth.name = 'telo'; cloth.scale = (3.3, 6.0, 1); bpy.ops.object.transform_apply(scale=True)
+bpy.ops.mesh.primitive_grid_add(x_subdivisions=70, y_subdivisions=95, size=1, location=(0, 0, CAR_H + 0.25))
+cloth = bpy.context.object; cloth.name = 'telo'; cloth.scale = (4.3, 6.6, 1); bpy.ops.object.transform_apply(scale=True)
 cloth.data.materials.append(m_cloth)
-pin_idx = [v.index for v in cloth.data.vertices if v.co.y < -2.75 and abs(v.co.x) < 0.45]
+pin_idx = [v.index for v in cloth.data.vertices if v.co.y < -3.05 and abs(v.co.x) < 0.5]
 cm = cloth.modifiers.new('cloth', 'CLOTH'); cm.settings.quality = 8; cm.settings.mass = 0.4
 cm.settings.tension_stiffness = 8; cm.settings.bending_stiffness = 0.6
 cm.collision_settings.collision_quality = 3; cm.collision_settings.distance_min = 0.012
