@@ -398,3 +398,6 @@ body:not([data-view=chat]) .tries{display:none}
 .idea .more b{color:var(--soft);font-weight:600}
 .importbox{display:flex;flex-wrap:wrap;align-items:center;gap:10px;max-width:760px;margin-bottom:14px;padding:10px 14px;border-radius:14px;border:1px solid rgba(142,248,255,.35);background:rgba(142,248,255,.07);font-size:14px;color:var(--soft)}
 body.real .kinds [data-kind=blender],body.real .kinds [data-kind=hyperframes],body.real .tries [data-try=blender],body.real .tries [data-try=hyperframes]{display:none}
+.tile li.assign label{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.tile li.assign select{font:inherit;font-size:13px;color:var(--text);background:var(--glass);border:1px solid var(--edge);border-radius:10px;padding:4px 8px}
+.tile li.assign small{color:var(--soft);font-size:12px}

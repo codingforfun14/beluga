@@ -159,6 +159,42 @@
     renderHome();
   }
 
+  /* ---------- chi lavora ---------- */
+
+  // In Centrale Fede sceglie quale programma fa partire ogni ruolo. Si possono scegliere solo programmi trovati sul Mac.
+  const baseHome = renderHome;
+  renderHome = function () {
+    baseHome();
+    if (!status) return;
+    const r = status.ruoli || {}, ass = status.assegnabili || {}, pr = status.programmi || {};
+    const row = (k, name) => {
+      const cur = r[k] && r[k].programma;
+      if (!ass[k]) return `<li><span class="led ${cur ? 'ok' : 'warn'}"></span><span><strong>${name}</strong> ${cur ? esc(PROG[cur] || cur) : 'Non attivo in questa fase'}</span></li>`;
+      const opts = ass[k].map(p => {
+        const i = pr[p] || {}, ok = status.modalita === 'test' || i.installato;
+        return `<option value="${p}"${p === cur ? ' selected' : ''}${ok ? '' : ' disabled'}>${esc(PROG[p] || p)}${ok ? '' : ' (non installato)'}</option>`;
+      }).join('');
+      const note = r[k].temporaneo ? 'temporaneo' : r[k].definitivo === cur ? 'definitivo' : '';
+      return `<li class="assign"><span class="led ok"></span><label><strong>${name}</strong><select data-assign="${k}" aria-label="Chi fa ${name}">${opts}</select>${note ? `<small>${note}</small>` : ''}</label></li>`;
+    };
+    const tile = document.createElement('article');
+    tile.className = 'tile who';
+    tile.innerHTML = `<h2>Chi lavora</h2><ul>${row('ideatore', 'Ideatore')}${row('revisore', 'Revisore')}${row('produzione', 'Produzione')}</ul>`;
+    $('#glance').appendChild(tile);
+  };
+
+  document.addEventListener('change', async e => {
+    const s = e.target.closest('select[data-assign]');
+    if (!s) return;
+    const k = s.dataset.assign, before = status.ruoli[k].programma;
+    s.disabled = true;
+    try {
+      await api.post('/api/ruoli', { ruolo: k, programma: s.value });
+      toast(`Da ora l'${k} è ${PROG[s.value] || s.value}`);
+    } catch (err) { toast(err.message); s.value = before; }
+    await loadStatus();
+  });
+
   /* ---------- azioni ---------- */
 
   send = async function (text) {
