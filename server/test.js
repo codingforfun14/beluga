@@ -113,12 +113,13 @@ async function test(name, fn) {
     const st = (await get('/api/stato')).body;
     assert.deepStrictEqual(st.assegnabili.ideatore, ['claude', 'codex']);
     assert.ok(st.programmi.codex, 'codex deve comparire anche se non assegnato');
+    const prima = JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.json'), 'utf8'));
     const a = await post('/api/ruoli', { ruolo: 'ideatore', programma: 'codex' });
     assert.strictEqual(a.code, 200);
     assert.strictEqual(a.body.temporaneo, false);
     let conf = JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.json'), 'utf8'));
     assert.strictEqual(conf.ruoli.ideatore.programma, 'codex');
-    assert.strictEqual(conf.programmi.claude.percorso, 'claude', 'gli altri campi restano');
+    assert.deepStrictEqual(conf.programmi, prima.programmi, 'gli altri campi restano');
     assert.strictEqual((await post('/api/ruoli', { ruolo: 'revisore', programma: 'claude' })).code, 422);
     assert.strictEqual((await post('/api/ruoli', { ruolo: 'ideatore', programma: 'bash' })).code, 422);
     assert.strictEqual((await post('/api/ruoli', { ruolo: '__proto__', programma: 'claude' })).code, 422);
