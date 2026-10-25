@@ -125,8 +125,8 @@ def neon_on(i, t0, flicker=True):
     m = tubes[i].data.materials[0]; e = emis(m); l = tube_lights[i]
     seq = [(t0 - 0.01, 0), (t0, 1), (t0 + 0.07, 0.1), (t0 + 0.13, 1), (t0 + 0.2, 0.3), (t0 + 0.3, 1)] if flicker else [(t0 - 0.01, 0), (t0, 1)]
     for t, v in [(0, 0)] + seq:
-        f = max(1, F(t)); e.default_value = 4.0 * v; e.keyframe_insert('default_value', frame=f)
-        l.energy = 140 * v; l.keyframe_insert('energy', frame=f)
+        f = max(1, F(t)); e.default_value = 3.0 * v; e.keyframe_insert('default_value', frame=f)
+        l.energy = 60 * v; l.keyframe_insert('energy', frame=f)
 # un neon si accende tremolando nel POV (7.5 s); alla rivelazione si accendono tutti in sequenza
 neon_on(2, 7.5)
 for k, i in enumerate([1, 4, 0, 3, 5]):
@@ -211,7 +211,8 @@ hk.matrix_inverse = Matrix.Translation(grab).inverted()
 cm = cloth.modifiers.new('cloth', 'CLOTH'); cm.settings.quality = 8; cm.settings.mass = 0.4
 cm.settings.tension_stiffness = 8; cm.settings.bending_stiffness = 0.6; cm.settings.vertex_group_mass = 'presa'
 cm.collision_settings.collision_quality = 3; cm.collision_settings.distance_min = 0.012
-cm.point_cache.frame_start, cm.point_cache.frame_end = 1, min(F(17), sc.frame_end)   # con FINO=6 il telo si calcola solo fino a 180
+# il telo e' fermo fino al tiro (12.5 s): la simulazione parte poco prima, risparmia ~18 minuti di calcolo
+cm.point_cache.frame_start, cm.point_cache.frame_end = F(12.3), min(F(17), sc.frame_end)
 cloth.modifiers.new('sol', 'SOLIDIFY').thickness = 0.006
 cloth.modifiers.new('sub', 'SUBSURF').levels = 1
 for p in cloth.data.polygons: p.use_smooth = True
@@ -274,7 +275,7 @@ if FINAL:
     nt.links.new(pv.outputs[0], nt.nodes['Material Output'].inputs['Volume'])
 sw = bpy.data.lights.new('striscia', 'AREA'); sw.shape = 'RECTANGLE'; sw.size = 3.0; sw.size_y = 0.15; sw.energy = 0
 swo = link(bpy.data.objects.new('striscia', sw)); swo.rotation_euler = (0, 0, 0)
-for t, y, e_ in [(15.4, -3.5, 0), (15.6, -3.0, 600), (17.4, 3.2, 600), (17.6, 3.6, 0)]:
+for t, y, e_ in [(15.4, -3.5, 0), (15.6, -3.0, 250), (17.4, 3.2, 250), (17.6, 3.6, 0)]:
     swo.location = (0, y, 2.6); swo.keyframe_insert('location', frame=F(t)); sw.energy = e_; sw.keyframe_insert('energy', frame=F(t))
 
 # ------------------------------------------------------------------ il quadro strumenti (set separato, lontano dal garage)
@@ -401,7 +402,7 @@ c3, t3 = cam('C3_orbita', 20, 4.0)
 orb = [(9.0 + i * 0.5, (3.3 * math.cos(math.radians(-135 + i * 15)), 3.95 * math.sin(math.radians(-135 + i * 15)), 1.75), (0, 0.2, 1.1)) for i in range(7)]
 path(c3, t3, orb); shots.append((9.0, c3))
 c4, t4 = cam('C4_telo', 26, 4.0)
-path(c4, t4, [(12.0, (3.8, -5.2, 1.1), (0, 0.2, 0.7)), (15.0, (3.6, -4.9, 1.0), (0, 0.6, 0.8))]); shots.append((12.0, c4))
+path(c4, t4, [(12.0, (-3.0, -5.3, 1.2), (0, 0.3, 0.8)), (15.0, (-2.8, -5.0, 1.1), (0, 0.6, 0.9))])   # lato sinistro: a destra gomme e carrello coprivano l'auto; shots.append((12.0, c4))
 c5, t5 = cam('C5_rivelazione', 30, 2.8)
 path(c5, t5, [(15.0, (3.4, -3.9, 0.55), (0, -0.4, 0.55)), (18.0, (2.9, -3.3, 0.5), (0, -0.2, 0.55))]); shots.append((15.0, c5))
 c6, t6 = cam('C6_POV_finestrino', 20)
