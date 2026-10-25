@@ -1,2 +1,11 @@
 .DS_Store
 node_modules/
+
+# dati di lavoro del servizio di Niko: restano sul Mac, non nel repository
+tasks/*
+!tasks/.gitkeep
+projects/*/work/*
+projects/*/tmp/*
+projects/*/previews/*
+projects/*/finals/*
+!projects/*/*/.gitkeep
