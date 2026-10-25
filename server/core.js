@@ -6,7 +6,7 @@ const L = require('./lib');
 const ideas = require('./ideas');
 const agents = require('./agents');
 
-const STATI = ['in_coda', 'in_corso', 'attesa_fede', 'completato', 'fallito', 'annullato', 'da_verificare'];
+const STATI = ['in_coda', 'in_corso', 'attesa_risposta', 'attesa_fede', 'completato', 'fallito', 'annullato', 'da_verificare'];
 const file = id => path.join(L.TASKS, `${id}.json`);
 const logFile = id => path.join(L.TASKS, `${id}.log`);
 const runLock = id => path.join(L.TASKS, `${id}.lock`);
@@ -118,7 +118,7 @@ function storeResult(t, testo, origine) {
   L.writeAtomic(path.join(dir, origine === 'manuale' ? 'risposta-manuale.txt' : 'risposta-agente.txt'), String(testo || ''));
   if (!v.ok) return v;
   L.writeJSON(path.join(dir, 'idee.json'), { incarico: t.id, versione: t.versione, origine, creato: L.now(), idee: v.idee });
-  L.writeAtomic(path.join(dir, 'idee.md'), ideas.toMarkdown(t, v.idee, origine === 'manuale' ? 'risposta incollata a mano da Fede (piano B)' : agentLabel(t)));
+  L.writeAtomic(path.join(dir, 'idee.md'), ideas.toMarkdown(t, v.idee, origine === 'manuale' ? 'risposta incollata a mano da Fede' : agentLabel(t)));
   t.risultato = { file: rel(path.join(dir, 'idee.json')), markdown: rel(path.join(dir, 'idee.md')), origine, idee: v.idee };
   return v;
 }
@@ -130,7 +130,7 @@ function act(id, azione, body = {}) {
   if (!t) return { errore: 'Incarico non trovato.', codice: 404 };
   const no = msg => ({ errore: msg, codice: 409 });
   if (azione === 'manuale') {
-    if (!['fallito', 'da_verificare', 'in_coda'].includes(t.stato)) return no('Il piano B serve solo per un incarico fermo o in attesa.');
+    if (!['attesa_risposta', 'fallito', 'da_verificare', 'in_coda'].includes(t.stato)) return no('Il piano B serve solo per un incarico fermo o in attesa.');
     const v = storeResult(t, String(body.testo || '').slice(0, 100000), 'manuale');
     if (!v.ok) { save(t, 'risposta_manuale_non_valida', { motivo: v.errore }); return { errore: `La risposta incollata non va bene: ${v.errore}`, codice: 422 }; }
     t.stato = 'attesa_fede'; t.errore = null;
@@ -213,6 +213,13 @@ async function runOne(t) {
     save(t, 'avviato', { programma: t.agente.programma });
     const prompt = ideas.buildPrompt(t);
     L.writeAtomic(path.join(workDir(t), 'prompt.md'), prompt);
+    // A mano: Niko prepara solo il prompt, Fede lo incolla in Claude o ChatGPT e riporta la risposta.
+    if (t.agente.programma === 'manuale') {
+      t.stato = 'attesa_risposta';
+      save(t, 'prompt_pronto', { file: path.relative(L.ROOT, path.join(workDir(t), 'prompt.md')) });
+      say('niko', `Il prompt è pronto (versione ${v2(t.versione)}). Copialo dalla scheda, incollalo in Claude o ChatGPT e poi incolla qui la risposta.`, t.id);
+      return;
+    }
     const a = agents.adapter(t.agente.programma);
     fs.mkdirSync(tmp, { recursive: true });
     const r = a ? await a.call(prompt, { cwd: tmp }) : { ok: false, errore: { tipo: 'programma_assente', messaggio: `Nessun programma configurato per il ruolo ${t.ruolo} in modelli.json.` } };
@@ -279,19 +286,19 @@ async function status() {
 /* ---------- chi lavora: Fede assegna un programma a un ruolo ---------- */
 
 // Solo i ruoli che in questa fase lavorano davvero, e solo i programmi che hanno un adattatore.
-const ASSEGNABILI = { ideatore: ['claude', 'codex'] };
+const ASSEGNABILI = { ideatore: ['manuale', 'claude', 'codex'] };
 
 async function assign(ruolo, programma) {
   if (!Object.hasOwn(ASSEGNABILI, ruolo)) return { errore: 'Questo ruolo non si può ancora assegnare.', codice: 422 };
   if (!ASSEGNABILI[ruolo].includes(programma)) return { errore: 'Programma non previsto per questo ruolo.', codice: 422 };
-  if (!process.env.BELUGA_AGENTE_FINTO) {
+  if (!process.env.BELUGA_AGENTE_FINTO && programma !== 'manuale') {
     const pr = await agents.probe(programma);
     if (!pr.installato) return { errore: `${programma === 'codex' ? 'Codex' : 'Claude'} non è installato sul Mac.`, codice: 409 };
   }
   const conf = modelli();
   if (!conf.ruoli || !conf.ruoli[ruolo]) return { errore: 'modelli.json non leggibile.', codice: 500 };
   // La scelta resta in modelli.locale.json, che non va su GitHub.
-  const temporaneo = !!conf.ruoli[ruolo].definitivo && conf.ruoli[ruolo].definitivo !== programma;
+  const temporaneo = programma !== 'manuale' && !!conf.ruoli[ruolo].definitivo && conf.ruoli[ruolo].definitivo !== programma;
   const loc = L.readJSON(L.MODELLI_LOCALE, {});
   L.writeJSON(L.MODELLI_LOCALE, L.merge(loc, { ruoli: { [ruolo]: { programma, temporaneo } } }));
   return { ruolo, programma, temporaneo };

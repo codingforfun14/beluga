@@ -19,8 +19,8 @@
   /* ---------- dal formato del servizio a quello dell'app ---------- */
 
   STEPS.idee = [['Idee', 'ideatore'], ['Controllo', 'ideatore'], ['Il tuo ok', 'you']];
-  const MAP = { in_coda: 'queue', in_corso: 'work', attesa_fede: 'you', completato: 'done', fallito: 'stuck', da_verificare: 'stuck', annullato: 'done' };
-  const PROG = { claude: 'Claude', codex: 'ChatGPT (Codex)' };
+  const MAP = { in_coda: 'queue', in_corso: 'work', attesa_risposta: 'you', attesa_fede: 'you', completato: 'done', fallito: 'stuck', da_verificare: 'stuck', annullato: 'done' };
+  const PROG = { manuale: 'A mano (copi tu il prompt)', claude: 'Claude', codex: 'ChatGPT (Codex)' };
   let status = null;
   const prompts = {};
 
@@ -34,12 +34,13 @@
   function toUI(s) {
     const state = MAP[s.stato] || 'queue';
     const t = { id: s.id, kind: 'idee', project: s.progetto, state, version: s.versione, title: s.titolo, real: s };
-    t.stateLabel = { fallito: 'Fermo', da_verificare: 'Da verificare', annullato: 'Annullato', completato: 'Approvato' }[s.stato];
+    t.stateLabel = { attesa_risposta: 'Tocca a te', fallito: 'Fermo', da_verificare: 'Da verificare', annullato: 'Annullato', completato: 'Approvato' }[s.stato];
     t.step = { queue: 0, work: 0, you: 2, done: 3, stuck: s.errore && s.errore.tipo === 'risposta_non_valida' ? 1 : 0 }[state];
     const who = `Ideatore: ${agentLabel(s.agente)}`;
     t.status = {
       in_coda: `In coda. ${who}.`,
       in_corso: `${who}. Ci lavora da ${ago(s.iniziato || s.aggiornato)}.`,
+      attesa_risposta: 'Il prompt è pronto: copialo, incollalo in Claude o ChatGPT e riporta qui la risposta.',
       attesa_fede: 'Le 3 idee sono pronte e hanno passato il controllo. Scegline una.',
       completato: s.scelta ? `Hai scelto "${s.scelta.titolo}".` : 'Approvato.',
       fallito: s.errore ? (s.errore.tipo === 'altro' ? `Errore: ${s.errore.messaggio}` : s.errore.messaggio) : 'Fermo.',
@@ -52,20 +53,20 @@
 
   /* ---------- schede ---------- */
 
-  function planB(t) {
+  function planB(t, normal) {
     const p = prompts[t.id];
     if (p == null) loadPrompt(t.id);
     return `<div class="planb">
-      <p class="planbtitle">Piano B: fallo a mano in 3 passi</p>
+      <p class="planbtitle">${normal ? 'Il prompt è pronto: 3 passi' : 'Piano B: fallo a mano in 3 passi'}</p>
       <ol>
-        <li><span>Copia le istruzioni</span><button class="soft small" data-copy="${t.id}">${icon('i-copy')}Copia</button></li>
-        <li><span>Incollale nella chat di Claude o di ChatGPT e invia</span></li>
-        <li><span>Incolla qui sotto la risposta: la controllo come quella dell'agente</span></li>
+        <li><span>Copia il prompt</span><button class="soft small" data-copy="${t.id}">${icon('i-copy')}Copia</button></li>
+        <li><span>${normal ? 'Incollalo' : 'Incolla le istruzioni'} nella chat di Claude o di ChatGPT e invia</span></li>
+        <li><span>Incolla qui sotto la risposta: la controllo e la salvo come versione</span></li>
       </ol>
-      <details><summary>Vedi le istruzioni</summary><pre data-prompt="${t.id}">${esc(p == null ? 'Carico…' : p)}</pre></details>
+      <details><summary>Vedi il prompt</summary><pre data-prompt="${t.id}">${esc(p == null ? 'Carico…' : p)}</pre></details>
       <label class="sr" for="answer-${t.id}">Risposta incollata</label>
       <textarea id="answer-${t.id}" rows="3" placeholder="Incolla qui la risposta"></textarea>
-      <div class="buttons"><button class="primary" data-resume="${t.id}">Controlla e salva</button><button class="soft" data-retry="${t.id}">Riprova con l'agente</button><button class="soft" data-cancel="${t.id}">Annulla</button></div>
+      <div class="buttons"><button class="primary" data-resume="${t.id}">Controlla e salva</button>${normal ? '' : `<button class="soft" data-retry="${t.id}">Riprova con l'agente</button>`}<button class="soft" data-cancel="${t.id}">Annulla</button></div>
     </div>`;
   }
 
@@ -87,6 +88,7 @@
     if (s.stato === 'in_coda') return `${temp}<div class="buttons"><button class="soft" data-cancel="${t.id}">Annulla</button></div>`;
     if (s.stato === 'da_verificare') return `<div class="buttons"><button class="primary" data-retry="${t.id}">Rilancia</button><button class="soft" data-cancel="${t.id}">Annulla</button></div>`;
     if (s.stato === 'fallito') return planB(t);
+    if (s.stato === 'attesa_risposta') return planB(t, true);
     return '';
   };
 
@@ -171,10 +173,10 @@
       const cur = r[k] && r[k].programma;
       if (!ass[k]) return `<li><span class="led ${cur ? 'ok' : 'warn'}"></span><span><strong>${name}</strong> ${cur ? esc(PROG[cur] || cur) : 'Non attivo in questa fase'}</span></li>`;
       const opts = ass[k].map(p => {
-        const i = pr[p] || {}, ok = status.modalita === 'test' || i.installato;
+        const i = pr[p] || {}, ok = p === 'manuale' || status.modalita === 'test' || i.installato;
         return `<option value="${p}"${p === cur ? ' selected' : ''}${ok ? '' : ' disabled'}>${esc(PROG[p] || p)}${ok ? '' : ' (non installato)'}</option>`;
       }).join('');
-      const note = r[k].temporaneo ? 'temporaneo' : r[k].definitivo === cur ? 'definitivo' : '';
+      const note = cur === 'manuale' ? 'nessun programma viene avviato' : r[k].temporaneo ? 'temporaneo' : r[k].definitivo === cur ? 'definitivo' : '';
       return `<li class="assign"><span class="led ok"></span><label><strong>${name}</strong><select data-assign="${k}" aria-label="Chi fa ${name}">${opts}</select>${note ? `<small>${note}</small>` : ''}</label></li>`;
     };
     const tile = document.createElement('article');
@@ -230,7 +232,7 @@
     try {
       if (d.copy) {
         if (prompts[d.copy] == null) await loadPrompt(d.copy);
-        copy(prompts[d.copy], b, 'Istruzioni copiate');
+        copy(prompts[d.copy], b, 'Prompt copiato');
       }
       if (d.resume) {
         const box = b.closest('.planb').querySelector('textarea');
