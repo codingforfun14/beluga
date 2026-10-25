@@ -1,0 +1,10 @@
+{
+  "nota": "Copia questo file come modelli.locale.json e adattalo al tuo Mac. Resta solo sul computer: non va su GitHub.",
+  "programmi": {
+    "claude": { "percorso": "/Users/TUONOME/.local/bin/claude" },
+    "codex": { "percorso": "/Users/TUONOME/.local/share/codex-npm/bin/codex", "modello": "gpt-6.1-sol" }
+  },
+  "ruoli": {
+    "ideatore": { "programma": "codex", "temporaneo": false }
+  }
+}

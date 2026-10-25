@@ -65,4 +65,15 @@ const unlock = file => { try { fs.unlinkSync(file); } catch {} };
 // Solo nomi semplici: niente "..", niente barre. Protegge da percorsi inventati.
 const safeName = s => typeof s === 'string' && /^[a-z0-9][a-z0-9-]{0,40}$/.test(s);
 
-module.exports = { ROOT, TASKS, PROJECTS, ROLES, APP, now, hash, writeAtomic, writeJSON, readJSON, appendLine, readLines, alive, lock, unlock, safeName };
+// modelli.json (su GitHub) + modelli.locale.json (solo su questo Mac: percorsi, modello, chi lavora).
+const MODELLI = path.join(ROOT, 'modelli.json');
+const MODELLI_LOCALE = path.join(ROOT, 'modelli.locale.json');
+const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
+function merge(a, b) {
+  const out = { ...a };
+  for (const [k, v] of Object.entries(b || {})) out[k] = isObj(v) && isObj(a[k]) ? merge(a[k], v) : v;
+  return out;
+}
+const readModelli = () => merge(readJSON(MODELLI, { ruoli: {} }), readJSON(MODELLI_LOCALE, {}));
+
+module.exports = { MODELLI, MODELLI_LOCALE, readModelli, merge, ROOT, TASKS, PROJECTS, ROLES, APP, now, hash, writeAtomic, writeJSON, readJSON, appendLine, readLines, alive, lock, unlock, safeName };

@@ -117,17 +117,19 @@ async function test(name, fn) {
     const a = await post('/api/ruoli', { ruolo: 'ideatore', programma: 'codex' });
     assert.strictEqual(a.code, 200);
     assert.strictEqual(a.body.temporaneo, false);
-    let conf = JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.json'), 'utf8'));
-    assert.strictEqual(conf.ruoli.ideatore.programma, 'codex');
-    assert.deepStrictEqual(conf.programmi, prima.programmi, 'gli altri campi restano');
+    assert.deepStrictEqual(JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.json'), 'utf8')), prima, 'modelli.json (su GitHub) non cambia');
+    let loc = JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.locale.json'), 'utf8'));
+    assert.strictEqual(loc.ruoli.ideatore.programma, 'codex');
+    assert.strictEqual((await get('/api/stato')).body.ruoli.ideatore.programma, 'codex');
+    assert.ok((await get('/api/stato')).body.ruoli.ideatore.definitivo, 'i campi di modelli.json restano');
     assert.strictEqual((await post('/api/ruoli', { ruolo: 'revisore', programma: 'claude' })).code, 422);
     assert.strictEqual((await post('/api/ruoli', { ruolo: 'ideatore', programma: 'bash' })).code, 422);
     assert.strictEqual((await post('/api/ruoli', { ruolo: '__proto__', programma: 'claude' })).code, 422);
     assert.strictEqual((await post('/api/ruoli', { ruolo: 'ideatore', programma: 'claude' }, { 'X-Niko': '' })).code, 403);
     const b = await post('/api/ruoli', { ruolo: 'ideatore', programma: 'claude' });
     assert.strictEqual(b.body.temporaneo, true);
-    conf = JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.json'), 'utf8'));
-    assert.strictEqual(conf.ruoli.ideatore.programma, 'claude');
+    loc = JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.locale.json'), 'utf8'));
+    assert.strictEqual(loc.ruoli.ideatore.programma, 'claude');
   });
 
   // 3. Riavvio: incarico e risultato restano. Poi un incarico interrotto a metà.

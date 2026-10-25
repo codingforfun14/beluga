@@ -48,6 +48,11 @@ Usano un agente finto in una cartella temporanea: non toccano i tuoi incarichi e
 - Un incarico alla volta. Non ci sono tentativi automatici: se un agente non risponde, l'incarico si ferma e puoi usare il piano B o "Riprova".
 
 ## Modello di Codex
-Se Codex risponde che il modello "non è supportato con un account ChatGPT", in `modelli.json` aggiungi
+Se Codex risponde che il modello "non è supportato con un account ChatGPT", in `modelli.locale.json` aggiungi
 `"modello": "<nome>"` sotto `programmi.codex`. Niko lo passa con `--model` solo per le sue chiamate,
 senza cambiare il tuo `~/.codex/config.toml`. I modelli disponibili per il tuo account si vedono con `codex debug models`.
+
+## Impostazioni solo di questo Mac
+`modelli.json` va su GitHub ed è generico. I percorsi dei programmi, il modello di Codex e la scelta di "Chi lavora"
+stanno in `modelli.locale.json`, che resta sul Mac (è in `.gitignore`) e vince su `modelli.json`.
+Un esempio è in `modelli.locale.esempio.json`. Gli accessi a Claude e Codex non stanno mai nel progetto: sono in `~/.claude` e `~/.codex`.

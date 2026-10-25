@@ -6,10 +6,10 @@ const fs = require('fs');
 const path = require('path');
 
 const LIMIT = 2 * 1024 * 1024;
-const ROOT = path.resolve(process.env.BELUGA_ROOT || path.join(__dirname, '..'));
+const { readModelli } = require('./lib');
 // Percorso del programma: da modelli.json ("programmi") se indicato, altrimenti il nome nel PATH.
 function conf(name) {
-  try { const c = JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.json'), 'utf8')); return (c.programmi && c.programmi[name]) || {}; } catch { return {}; }
+  const c = readModelli(); return (c.programmi && c.programmi[name]) || {};
 }
 const bin = name => conf(name).percorso || name;
 // Modello scelto in modelli.json solo per le chiamate di Niko: il config personale del programma resta com'è.
