@@ -119,10 +119,11 @@ function renderChat() {
 
 /* ---------- centrale: Niko al centro, i reparti intorno ---------- */
 
-// Posizioni in percentuale dentro la mappa
-const SPOTS = {
-  ideatore: [15, 40], revisore: [85, 40], produzione: [73, 88], consegne: [27, 88], libreria: [50, 11],
-};
+// Dove ogni cavo è agganciato, in percentuale dentro la scena. L'ultimo valore dice dove va l'etichetta:
+// sul computer sta all'esterno del cavo, sul telefono sotto o sopra l'aggancio.
+const anchors = () => innerWidth <= 760
+  ? { libreria: [50, 2, 'top'], ideatore: [6, 18, 'tl'], revisore: [94, 18, 'tr'], produzione: [94, 95, 'br'], consegne: [6, 95, 'bl'] }
+  : { libreria: [50, 3, 'top'], ideatore: [22, 10, 'ol'], revisore: [78, 10, 'or'], produzione: [78, 94, 'or'], consegne: [22, 94, 'ol'] };
 
 function deptState(id) {
   if (id === 'consegne') {
@@ -146,21 +147,23 @@ function deptState(id) {
 
 function renderHome() {
   const need = needYou().length;
-  const lines = Object.entries(SPOTS).map(([id, [x, y]]) => `<line class="link l-${deptState(id).state}" x1="50" y1="52" x2="${x}" y2="${y}" vector-effect="non-scaling-stroke"/>`).join('');
-  const nodes = Object.entries(SPOTS).map(([id, [x, y]]) => {
-    const d = DEPTS[id], s = deptState(id);
-    return `<button class="node n-${s.state}" style="--x:${x}%;--y:${y}%" data-dept="${id}">
-      <span class="nicon">${icon(d.icon)}</span>
-      <span class="ntext"><strong>${d.name}${s.n ? `<b>${s.n}</b>` : ''}</strong><span>${esc(s.text)}</span><small>${esc(d.uses)}</small></span>
+  holo.states = {};
+  const labels = Object.entries(anchors()).map(([id, [x, y, side]]) => {
+    const d = DEPTS[id], st = deptState(id);
+    holo.states[id] = st.state;
+    return `<button class="tag t-${st.state} at-${side}" style="--x:${x}%;--y:${y}%" data-dept="${id}">
+      <span class="tagname">${d.name}${st.n ? ` <b>${String(st.n).padStart(2, '0')}</b>` : ''}</span>
+      <span class="tagstate">${esc(st.text)}</span>
+      <small>${esc(d.uses)}</small>
     </button>`;
   }).join('');
-  $('#stage').innerHTML = `<svg class="wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>
-    <button class="core${need ? ' alert' : ''}" data-view="${need ? 'work' : 'chat'}" style="--x:50%;--y:52%">
-      <span class="corepic"><img src="assets/niko-buddy.webp" alt="" width="120" height="120"></span>
-      <strong>Niko</strong>
+  $('#stage').innerHTML = `<canvas class="holo" aria-hidden="true"></canvas>
+    <button class="core${need ? ' alert' : ''}" data-view="${need ? 'work' : 'chat'}">
+      <strong>NIKO</strong>
       <span>${need ? `${need === 1 ? 'Una cosa aspetta' : need + ' cose aspettano'} te` : 'Tutto tranquillo'}</span>
     </button>
-    ${nodes}`;
+    ${labels}`;
+  holo.mount($('#stage canvas'));
 
   const next = db.events.filter(e => e.type === 'out' && e.date >= dkey(new Date())).sort((a, b) => a.date.localeCompare(b.date))[0];
   const nd = next && db.deliveries.find(d => d.date === next.date && !d.published);
@@ -287,6 +290,7 @@ function show(name) {
   });
   document.body.dataset.view = name;
   if (name === 'chat') { $('#feed').scrollTop = $('#feed').scrollHeight; $('#peek').hidden = true; }
+  if (name === 'home') { holo.size(); holo.draw(performance.now()); }
   const v = $('#view-' + name);
   if (v.classList.contains('page')) v.scrollTop = 0;
 }
@@ -489,6 +493,119 @@ $('#prevmonth').onclick = () => { month.setMonth(month.getMonth() - 1); renderCa
 $('#nextmonth').onclick = () => { month.setMonth(month.getMonth() + 1); renderCalendar(); };
 $('#thismonth').onclick = () => { const d = new Date(); month = new Date(d.getFullYear(), d.getMonth(), 1); renderCalendar(); };
 window.addEventListener('hashchange', () => { const v = location.hash.slice(1); if (views.includes(v)) show(v); });
+
+/* ---------- l'ologramma della Centrale, tenuto su dai cavi dei reparti ---------- */
+
+const holo = {
+  states: {},
+  cv: null,
+  mount(cv) { this.cv = cv; this.ctx = cv.getContext('2d'); this.size(); this.draw(performance.now()); },
+  size() {
+    if (!this.cv) return;
+    const r = this.cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+    this.w = r.width; this.h = r.height;
+    this.cv.width = r.width * dpr; this.cv.height = r.height * dpr;
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  },
+  draw(t) {
+    const { ctx, w, h } = this;
+    if (!ctx || !w) return;
+    ctx.clearRect(0, 0, w, h);
+    const cx = w / 2, cy = h * 0.47, R = Math.min(w, h) * (w < 600 ? 0.2 : 0.17);
+    if (this.below !== cy + R) { this.below = cy + R; this.cv.parentElement.style.setProperty('--below', Math.round(cy + R + 18) + 'px'); }
+    const flick = 0.9 + 0.1 * Math.sin(t * 0.03) * Math.sin(t * 0.011);
+    const glitch = (t % 4200) < 110 ? Math.sin(t) * 6 : 0;
+
+    // cavi: da ogni aggancio all'anello dell'ologramma
+    const COL = { work: [142, 248, 255], you: [243, 155, 227], ready: [143, 240, 189], stuck: [255, 197, 138], queue: [190, 160, 255], idle: [150, 135, 190] };
+    for (const [id, [px, py]] of Object.entries(anchors())) {
+      const st = this.states[id] || 'idle', c = COL[st];
+      const ax = w * px / 100, ay = h * py / 100;
+      const th = Math.atan2(ay - cy, ax - cx);
+      const bx = cx + Math.cos(th) * R * 1.45, by = cy + Math.sin(th) * R * 0.42;
+      const sway = Math.sin(t * 0.0009 + px) * 6;
+      const mx = (ax + bx) / 2 + sway, my = (ay + by) / 2 + Math.hypot(ax - bx, ay - by) * 0.12;
+      const path = () => { ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo(mx, my, bx, by); };
+      // guaina scura e anima luminosa
+      path(); ctx.strokeStyle = 'rgba(8,6,18,.9)'; ctx.lineWidth = 5; ctx.stroke();
+      const live = st === 'work' || st === 'you' || st === 'ready';
+      const a = st === 'idle' ? 0.25 : st === 'stuck' ? 0.35 + 0.5 * (Math.sin(t * 0.02) > 0.6 ? 1 : 0.2) : live ? 0.85 : 0.45;
+      path(); ctx.strokeStyle = `rgba(${c},${a})`; ctx.lineWidth = live ? 1.6 : 1.1;
+      ctx.shadowColor = `rgba(${c},.9)`; ctx.shadowBlur = live ? 10 : 0; ctx.stroke(); ctx.shadowBlur = 0;
+      // impulsi di energia lungo il cavo
+      if (live) {
+        for (let k = 0; k < 3; k++) {
+          let u = ((t * 0.00035 + k / 3 + px * 0.01) % 1);
+          if (st === 'you') u = 1 - u; // verso di te
+          const qx = (1 - u) ** 2 * ax + 2 * (1 - u) * u * mx + u * u * bx, qy = (1 - u) ** 2 * ay + 2 * (1 - u) * u * my + u * u * by;
+          ctx.fillStyle = `rgba(${c},.95)`; ctx.shadowColor = `rgb(${c})`; ctx.shadowBlur = 12;
+          ctx.beginPath(); ctx.arc(qx, qy, 2.4, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0;
+        }
+      }
+      // morsetti alle due estremità
+      ctx.fillStyle = '#0b0818'; ctx.strokeStyle = `rgba(${c},${Math.max(a, 0.4)})`; ctx.lineWidth = 1.2;
+      for (const [x, y, s] of [[ax, ay, 5], [bx, by, 3.5]]) { ctx.beginPath(); ctx.rect(x - s, y - s, s * 2, s * 2); ctx.fill(); ctx.stroke(); }
+    }
+
+    // l'ologramma
+    ctx.save();
+    ctx.translate(glitch, 0);
+    const halo = ctx.createRadialGradient(cx, cy, R * 0.2, cx, cy, R * 2.2);
+    halo.addColorStop(0, 'rgba(142,248,255,.16)'); halo.addColorStop(1, 'rgba(142,248,255,0)');
+    ctx.fillStyle = halo; ctx.fillRect(cx - R * 2.2, cy - R * 2.2, R * 4.4, R * 4.4);
+    ctx.globalAlpha = flick;
+    ctx.strokeStyle = 'rgba(142,248,255,.55)'; ctx.lineWidth = 1;
+    const spin = t * 0.00035;
+    // meridiani
+    for (let k = 0; k < 9; k++) {
+      const ph = spin + k * Math.PI / 9, rx = Math.abs(Math.cos(ph)) * R;
+      ctx.globalAlpha = flick * (Math.sin(ph) > 0 ? 0.75 : 0.25);
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx, R, 0, 0, 6.283); ctx.stroke();
+    }
+    // paralleli
+    ctx.globalAlpha = flick * 0.5;
+    for (let j = -3; j <= 3; j++) {
+      const la = j * Math.PI / 8, y = cy + Math.sin(la) * R, rx = Math.cos(la) * R;
+      ctx.beginPath(); ctx.ellipse(cx, y, rx, rx * 0.16, 0, 0, 6.283); ctx.stroke();
+    }
+    // nucleo che respira
+    const pulse = 0.5 + 0.5 * Math.sin(t * 0.002);
+    const core = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 0.5);
+    core.addColorStop(0, `rgba(230,250,255,${0.75 + 0.25 * pulse})`); core.addColorStop(0.35, 'rgba(142,248,255,.45)'); core.addColorStop(1, 'rgba(184,146,255,0)');
+    ctx.globalAlpha = flick; ctx.fillStyle = core; ctx.beginPath(); ctx.arc(cx, cy, R * 0.5, 0, 6.283); ctx.fill();
+    // poliedro interno che gira al contrario
+    ctx.strokeStyle = 'rgba(200,175,255,.7)'; ctx.globalAlpha = flick * 0.8;
+    const pts = Array.from({ length: 6 }, (_, i) => { const an = -spin * 2 + i * Math.PI / 3; return [cx + Math.cos(an) * R * 0.38, cy + Math.sin(an) * R * 0.38 * 0.9]; });
+    ctx.beginPath(); pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath();
+    pts.forEach(([x, y], i) => { if (i % 2 === 0) { ctx.moveTo(x, y); ctx.lineTo(...pts[(i + 3) % 6]); } });
+    ctx.stroke();
+    // anello dove si agganciano i cavi
+    ctx.globalAlpha = 0.9; ctx.strokeStyle = 'rgba(190,160,255,.75)'; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.ellipse(cx, cy, R * 1.45, R * 0.42, 0, 0, 6.283); ctx.stroke();
+    ctx.setLineDash([2, 6]); ctx.lineDashOffset = -t * 0.02; ctx.strokeStyle = 'rgba(142,248,255,.6)';
+    ctx.beginPath(); ctx.ellipse(cx, cy, R * 1.6, R * 0.47, 0, 0, 6.283); ctx.stroke(); ctx.setLineDash([]);
+    // linee di scansione
+    ctx.globalAlpha = 0.07; ctx.fillStyle = '#8ef8ff';
+    for (let y = cy - R + ((t * 0.03) % 4); y < cy + R; y += 4) ctx.fillRect(cx - R, y, R * 2, 1);
+    ctx.restore();
+  },
+};
+
+(function holoLoop() {
+  let last = 0;
+  const tick = t => {
+    requestAnimationFrame(tick);
+    if (document.hidden || document.body.dataset.view !== 'home' || t - last < 33) return;
+    last = t;
+    holo.draw(t);
+  };
+  if (!calm) requestAnimationFrame(tick);
+  let wide = innerWidth > 760;
+  addEventListener('resize', () => {
+    if (wide !== innerWidth > 760) { wide = !wide; renderHome(); }
+    holo.size(); holo.draw(performance.now());
+  });
+})();
 
 /* ---------- lo spazio fuori dalla finestra ---------- */
 

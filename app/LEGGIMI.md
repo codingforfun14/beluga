@@ -2,7 +2,7 @@
 
 La finestra di BELUGA, in una stanza con lo spazio e i pianeti che si muovono dietro. Le pagine:
 
-- **Centrale**: Niko al centro e i reparti intorno (Ideatore, Revisore, Produzione, Consegne, Libreria). Le linee si accendono quando un reparto lavora.
+- **Centrale**: Niko è un ologramma sospeso nello spazio, tenuto su da cavi. Ogni cavo è un reparto (Ideatore, Revisore, Produzione, Consegne, Libreria): quando lavora, nel cavo scorre energia.
 - **Chat**: la conversazione con Niko. La barra per scrivergli resta in basso su ogni pagina.
 - **Lavori**: in alto quello che aspetta Fede, sotto i lavori divisi per reparto. Si approva sempre una versione precisa (v01, v02…).
 - **Consegne**: il pacchetto pronto da pubblicare (video finale, didascalia, dove e quando). Niko non pubblica da solo.
