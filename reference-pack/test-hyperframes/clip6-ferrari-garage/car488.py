@@ -9,6 +9,7 @@ def srgb(h):
     return tuple(x / 12.92 if x <= 0.04045 else ((x + 0.055) / 1.055) ** 2.4 for x in c)
 
 ROSSO_CORSA = srgb('#C80000')
+USE_DISPLACE = False   # in Eevee il Displace crea artefatti sui passaruota: per ora spento
 
 def unlink(m, p, names=('Base Color', 'Roughness', 'Metallic', 'Alpha')):
     # i materiali glTF spesso hanno il colore collegato ai colori dei vertici: lo stacchiamo
@@ -62,7 +63,10 @@ def load(path):
         elif m.name == 'Color_A08':   # fanali posteriori rossi traslucidi
             p.inputs['Emission Color'].default_value = (1, 0.02, 0.01, 1); p.inputs['Emission Strength'].default_value = 0.0
         elif m.name == 'Tyre_Side': satin(m, 0.025, 0.75)
-        elif m.name in ('material_0', 'Color_B05_3', 'Color_C03', 'black2'): satin(m, 0.02, 0.35)   # griglie e diffusore (nel glb chiari)
+        elif m.name in ('material_0', 'Color_B05_3', 'Color_C03'): satin(m, 0.02, 0.35)
+        elif m.name == 'black2':
+            satin(m, 0.015, 0.8); m.node_tree.nodes['Principled BSDF'].inputs['Specular IOR Level'].default_value = 0.05   # plastica opaca: lucida rifletteva la luce del giorno come un pannello azzurro   # griglie e diffusore (nel glb chiari)
+        elif m.name in ('Profiel02', 'material', 'material_8', 'material_8_1'): satin(m, 0.015, 0.7)   # gomme e plastiche bianche nel glb
         elif m.name in ('Chrome_Trim1', 'Metal_Corrogated_Shiny'): satin(m, 0.9, 0.12, 1.0)
         elif tuple(round(x, 2) for x in bc[:3]) == (1.0, 1.0, 1.0): satin(m, 0.03, 0.4)   # parti bianche SketchUp = plastiche/carbonio
         else: p.inputs['Roughness'].default_value = min(p.inputs['Roughness'].default_value, 0.5)
@@ -77,5 +81,9 @@ def load(path):
                 bpy.ops.object.shade_auto_smooth(angle=math.radians(35))
         except Exception:
             pass
+    # il guscio nero (Object_70/72) si sovrappone alla carrozzeria: Object_78 spinta fuori di 4 mm
+    b = bpy.data.objects.get('Object_78')
+    if b and USE_DISPLACE:
+        d = b.modifiers.new('fuori', 'DISPLACE'); d.direction = 'NORMAL'; d.mid_level = 0; d.strength = 0.004 / 0.0254
     pivot['size'] = tuple(mx - mn)
     return pivot
