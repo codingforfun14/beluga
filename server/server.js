@@ -81,6 +81,7 @@ async function api(req, res, url) {
   if (p === '/api/stato' && !isWrite) return send(res, 200, await core.status());
   if (p === '/api/lavori' && !isWrite) return send(res, 200, core.list());
   if (p === '/api/chat' && !isWrite) return send(res, 200, core.chat());
+  if (p === '/api/ruoli' && isWrite) { const r = await core.assign(String(body.ruolo || ''), String(body.programma || '')); return send(res, r.errore ? r.codice : 200, r); }
   if (p === '/api/messaggi' && isWrite) { const r = core.receive(body); return send(res, r.errore ? 422 : 200, r); }
   if ((m = p.match(/^\/api\/lavori\/(t-[a-z0-9-]+)\/piano-b$/)) && !isWrite) {
     const t = core.get(m[1]);

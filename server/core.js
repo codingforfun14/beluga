@@ -269,10 +269,35 @@ function stopWorker() { clearInterval(timer); L.unlock(WORKER_LOCK); }
 async function status() {
   const conf = modelli();
   const verified = L.readJSON(AGENTI, {});
-  const used = [...new Set(Object.values(conf.ruoli).map(r => r.programma).filter(Boolean))];
+  // Tutti i programmi conosciuti, anche quelli non assegnati: servono per scegliere chi lavora.
+  const known = Object.keys(conf.programmi || {});
   const programmi = {};
-  for (const p of used) programmi[p] = { ...(await agents.probe(p)), ultimo_successo: (verified[p] || {}).verificato || null };
-  return { modalita: process.env.BELUGA_AGENTE_FINTO ? 'test' : 'reale', ruoli: conf.ruoli, programmi, progetti: projects(), worker: !!timer };
+  for (const p of known) programmi[p] = { ...(await agents.probe(p)), ultimo_successo: (verified[p] || {}).verificato || null };
+  return { modalita: process.env.BELUGA_AGENTE_FINTO ? 'test' : 'reale', ruoli: conf.ruoli, assegnabili: ASSEGNABILI, programmi, progetti: projects(), worker: !!timer };
 }
 
-module.exports = { STATI, list, get, receive, act, chat, startWorker, stopWorker, status, planBPrompt, projects, workDir };
+/* ---------- chi lavora: Fede assegna un programma a un ruolo ---------- */
+
+// Solo i ruoli che in questa fase lavorano davvero, e solo i programmi che hanno un adattatore.
+const ASSEGNABILI = { ideatore: ['claude', 'codex'] };
+
+async function assign(ruolo, programma) {
+  if (!Object.hasOwn(ASSEGNABILI, ruolo)) return { errore: 'Questo ruolo non si può ancora assegnare.', codice: 422 };
+  if (!ASSEGNABILI[ruolo].includes(programma)) return { errore: 'Programma non previsto per questo ruolo.', codice: 422 };
+  if (!process.env.BELUGA_AGENTE_FINTO) {
+    const pr = await agents.probe(programma);
+    if (!pr.installato) return { errore: `${programma === 'codex' ? 'Codex' : 'Claude'} non è installato sul Mac.`, codice: 409 };
+  }
+  const file = path.join(L.ROOT, 'modelli.json');
+  const conf = L.readJSON(file, null);
+  if (!conf || !conf.ruoli || !conf.ruoli[ruolo]) return { errore: 'modelli.json non leggibile.', codice: 500 };
+  const r = conf.ruoli[ruolo];
+  if (r.programma !== programma) {
+    r.programma = programma;
+    r.temporaneo = !!r.definitivo && r.definitivo !== programma;
+    L.writeJSON(file, conf);
+  }
+  return { ruolo, programma, temporaneo: r.temporaneo };
+}
+
+module.exports = { STATI, list, get, receive, act, chat, startWorker, stopWorker, status, assign, planBPrompt, projects, workDir };

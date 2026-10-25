@@ -109,6 +109,26 @@ async function test(name, fn) {
     assert.strictEqual((await get('/%2e%2e/modelli.json')).code, 404);
   });
 
+  await test('Chi lavora: Fede assegna l\'Ideatore, ruoli e programmi non previsti rifiutati', async () => {
+    const st = (await get('/api/stato')).body;
+    assert.deepStrictEqual(st.assegnabili.ideatore, ['claude', 'codex']);
+    assert.ok(st.programmi.codex, 'codex deve comparire anche se non assegnato');
+    const a = await post('/api/ruoli', { ruolo: 'ideatore', programma: 'codex' });
+    assert.strictEqual(a.code, 200);
+    assert.strictEqual(a.body.temporaneo, false);
+    let conf = JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.json'), 'utf8'));
+    assert.strictEqual(conf.ruoli.ideatore.programma, 'codex');
+    assert.strictEqual(conf.programmi.claude.percorso, 'claude', 'gli altri campi restano');
+    assert.strictEqual((await post('/api/ruoli', { ruolo: 'revisore', programma: 'claude' })).code, 422);
+    assert.strictEqual((await post('/api/ruoli', { ruolo: 'ideatore', programma: 'bash' })).code, 422);
+    assert.strictEqual((await post('/api/ruoli', { ruolo: '__proto__', programma: 'claude' })).code, 422);
+    assert.strictEqual((await post('/api/ruoli', { ruolo: 'ideatore', programma: 'claude' }, { 'X-Niko': '' })).code, 403);
+    const b = await post('/api/ruoli', { ruolo: 'ideatore', programma: 'claude' });
+    assert.strictEqual(b.body.temporaneo, true);
+    conf = JSON.parse(fs.readFileSync(path.join(ROOT, 'modelli.json'), 'utf8'));
+    assert.strictEqual(conf.ruoli.ideatore.programma, 'claude');
+  });
+
   // 3. Riavvio: incarico e risultato restano. Poi un incarico interrotto a metà.
   await stop();
   await start('buono', 3000);
