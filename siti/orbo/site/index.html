@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ORBO One</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="ORBO One wireless earbuds, taken apart one part at a time. A design study for a fictional brand.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Hanken+Grotesk:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+</head>
+<body>
+<style>
+/* Layout: a teardown sheet. The product hangs in a pinned stage while the
+   page scrolls; each part gets a callout drawn like a technical drawing. */
+:root {
+  --void: #000000;
+  --panel: #0e0d0c;
+  --ink: #ece7df;
+  --mist: #8c857c;
+  --copper: #c8875a;
+  --copper-dim: rgba(200, 135, 90, 0.45);
+  --hair: rgba(236, 231, 223, 0.12);
+  --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --body: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --gutter: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--void); }
+body {
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--copper); outline-offset: 3px; }
+
+/* Header */
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--void);
+}
+.top {
+  position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 9;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding-block: 18px;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+  background: linear-gradient(var(--void), rgba(0, 0, 0, 0));
+}
+.mark { font-family: var(--display); font-weight: 500; letter-spacing: 0.32em; font-size: 15px; text-decoration: none; }
+.top nav { display: flex; align-items: center; gap: 28px; font-size: 14px; color: var(--mist); }
+.top nav a { text-decoration: none; }
+.top nav a:hover { color: var(--ink); }
+.btn {
+  font: 500 14px/1 var(--body); letter-spacing: 0.02em;
+  color: var(--void); background: var(--copper);
+  border: 0; border-radius: 999px; padding: 12px 20px; cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover { background: #d89a6e; }
+.btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--copper-dim); }
+.btn.ghost:hover { box-shadow: inset 0 0 0 1px var(--copper); }
+
+/* Teardown: tall scroll track with a pinned stage */
+.teardown { position: relative; height: 640vh; }
+.stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+#frame { position: absolute; display: block; }
+#callouts { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+#callouts line { stroke: var(--copper-dim); stroke-width: 1; }
+#callouts circle { fill: var(--copper); }
+
+.intro {
+  position: absolute; left: var(--gutter); bottom: 12vh;
+  padding-left: max(8px, 4vw); max-width: 560px;
+  transition: opacity .3s linear, transform .3s ease-out;
+}
+.eyebrow { font: 500 12px/1.4 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--copper); margin: 0 0 18px; }
+h1, h2 { font-family: var(--display); font-weight: 300; text-wrap: balance; margin: 0; letter-spacing: -0.02em; }
+h1 { font-size: clamp(40px, 6.4vw, 92px); line-height: 1.02; }
+h1 b, h2 b { font-weight: 700; }
+.intro p.lede { color: var(--mist); margin: 22px 0 0; font-size: 17px; }
+.scrollcue { display: inline-flex; gap: 10px; align-items: center; margin-top: 28px; font: 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); }
+.scrollcue i { width: 1px; height: 34px; background: linear-gradient(var(--copper), transparent); animation: cue 1.8s ease-in-out infinite; }
+@keyframes cue { 0%,100% { transform: scaleY(.4); transform-origin: top; } 50% { transform: scaleY(1); } }
+
+.label {
+  position: absolute; width: min(250px, 30vw);
+  transition: opacity .35s ease-out, transform .35s ease-out;
+  opacity: 0; transform: translateY(6px);
+}
+.label.on { opacity: 1; transform: none; }
+.label .n { font: 500 11px/1 var(--mono); letter-spacing: .14em; color: var(--copper); }
+.label h3 { font: 500 17px/1.25 var(--body); margin: 8px 0 4px; }
+.label p { margin: 0; color: var(--mist); font-size: 14px; line-height: 1.45; }
+.label.right { text-align: left; }
+.label.left { text-align: right; }
+
+.outro {
+  position: absolute; right: var(--gutter-r); bottom: 12vh; max-width: 440px;
+  padding-right: max(8px, 4vw); text-align: right;
+  opacity: 0; transition: opacity .4s ease-out;
+}
+.outro.on { opacity: 1; }
+.outro h2 { font-size: clamp(28px, 3.6vw, 48px); line-height: 1.08; }
+.outro p { color: var(--mist); margin: 14px 0 0; }
+
+.meter {
+  position: absolute; left: var(--gutter); top: 50%; transform: translateY(-50%);
+  padding-left: max(8px, 1.6vw);
+  display: grid; gap: 10px; transition: opacity .3s; font: 11px var(--mono); color: var(--mist); letter-spacing: .1em;
+}
+.meter span { display: block; width: 18px; height: 1px; background: var(--hair); transition: width .3s, background .3s; }
+.meter span.on { width: 34px; background: var(--copper); }
+
+/* Content sections after the teardown */
+.band { padding-block: clamp(80px, 14vw, 180px); padding-left: var(--gutter); padding-right: var(--gutter-r); }
+.wrap { max-width: 1120px; margin: 0 auto; }
+.weight { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: end; }
+.weight .big { font-family: var(--display); font-weight: 300; font-size: clamp(88px, 16vw, 220px); line-height: .9; letter-spacing: -0.05em; }
+.weight .big small { font-size: .32em; letter-spacing: 0; color: var(--copper); margin-left: .1em; }
+.weight p { max-width: 42ch; color: var(--mist); margin: 0; font-size: 19px; }
+.weight p strong { color: var(--ink); font-weight: 500; }
+
+.specs h2, .colors h2 { font-size: clamp(28px, 3.4vw, 44px); margin-bottom: 40px; }
+.specs dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 0; border-top: 1px solid var(--hair); }
+.specs .row { padding: 26px 24px 28px 0; border-bottom: 1px solid var(--hair); min-width: 0; }
+.specs dt { font: 500 11px/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--mist); }
+.specs dd { margin: 10px 0 0; font-family: var(--display); font-weight: 300; font-size: clamp(22px, 2.4vw, 30px); line-height: 1.15; font-variant-numeric: tabular-nums; }
+.specs dd small { display: block; font: 14px/1.4 var(--body); color: var(--mist); margin-top: 6px; }
+
+.colors { background: var(--panel); }
+.swatches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.swatch { display: grid; gap: 18px; justify-items: start; }
+.bud {
+  width: 112px; aspect-ratio: 1; max-width: 100%; border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, var(--hi), var(--shell) 58%, #000 100%);
+  display: grid; place-items: center; box-shadow: 0 30px 50px -24px #000;
+}
+.bud::after {
+  content: ""; width: 62%; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, #2a2a2c, #050505 60%);
+  box-shadow: 0 0 0 3px var(--ring), 0 0 0 4px rgba(0,0,0,.6);
+}
+.swatch h3 { font: 500 17px/1.2 var(--body); margin: 0; }
+.swatch p { margin: 4px 0 0; color: var(--mist); font-size: 14px; }
+
+.cta { text-align: center; }
+.cta h2 { font-size: clamp(40px, 7vw, 96px); line-height: 1; }
+.cta h2 span { color: var(--copper); }
+.cta .actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 36px; }
+#preorder-note { margin: 22px auto 0; color: var(--mist); font-size: 15px; max-width: 46ch; }
+
+footer { border-top: 1px solid var(--hair); padding-block: 28px; padding-left: var(--gutter); padding-right: var(--gutter-r); color: var(--mist); font-size: 13px; }
+footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+@media (max-width: 760px) {
+  .top nav a:not(.btn) { display: none; }
+  .intro { bottom: 8vh; padding-left: 0; }
+  .label { width: 40vw; }
+  .label p { display: none; }
+  .label h3 { font-size: 14px; }
+  .outro { left: var(--gutter); padding-right: 0; max-width: none; bottom: 7vh; }
+  .meter { display: none; }
+  .weight { grid-template-columns: 1fr; gap: 24px; }
+  .specs dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .swatches { grid-template-columns: 1fr; }
+  .swatch { grid-template-columns: auto 1fr; align-items: center; }
+  .bud { width: 76px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scrollcue i { animation: none; }
+  .label, .intro, .outro { transition: none; }
+}
+</style>
+
+<header class="top">
+  <a class="mark" href="#top" aria-label="ORBO home">ORBO</a>
+  <nav>
+    <a href="#inside">Inside</a>
+    <a href="#specs">Specs</a>
+    <a class="btn ghost" href="#preorder">Preorder</a>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="teardown" id="inside" aria-label="ORBO One, taken apart">
+    <div class="stage" id="stage">
+      <canvas id="frame" aria-hidden="true"></canvas>
+      <svg id="callouts" aria-hidden="true"></svg>
+
+      <div class="intro" id="intro">
+        <p class="eyebrow">ORBO One · True wireless</p>
+        <h1>Sound, <b>taken apart.</b></h1>
+        <p class="lede">Scroll to look inside ORBO One.</p>
+        <div class="scrollcue"><i></i>Scroll</div>
+      </div>
+
+      <div class="meter" id="meter" aria-hidden="true"></div>
+
+      <div class="label right" data-part="cap"><div class="n">01</div><h3>Copper-ring touch surface</h3><p>Tap, hold, swipe. Nothing to press.</p></div>
+      <div class="label left" data-part="upper"><div class="n">02</div><h3>Six microphones</h3><p>Your voice stays clear. The street does not.</p></div>
+      <div class="label right" data-part="pcb"><div class="n">03</div><h3>ORBO S1 chip</h3><p>Adaptive noise cancelling, 48,000 times a second.</p></div>
+      <div class="label left" data-part="battery"><div class="n">04</div><h3>Battery</h3><p>8 hours in the bud, 40 with the case.</p></div>
+      <div class="label right" data-part="driver"><div class="n">05</div><h3>11 mm graphene driver</h3><p>Deep bass without the boom.</p></div>
+
+      <div class="outro" id="outro">
+        <h2>Every part tuned. <b>Then put back together.</b></h2>
+        <p>4.6 g each. You'll forget they're there.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap weight">
+      <div class="big">4.6<small>g</small></div>
+      <p><strong>Seven parts, one pebble.</strong> The shell is shaped from a single curve so nothing presses on the ear. You wear it for a flight and forget to take it out.</p>
+    </div>
+  </section>
+
+  <section class="band specs" id="specs">
+    <div class="wrap">
+      <h2>Specs</h2>
+      <dl>
+        <div class="row"><dt>Driver</dt><dd>11 mm<small>Graphene diaphragm</small></dd></div>
+        <div class="row"><dt>Noise cancelling</dt><dd>Up to 48 dB<small>Adaptive, six mics</small></dd></div>
+        <div class="row"><dt>Battery</dt><dd>8 h · 40 h<small>Bud · with case</small></dd></div>
+        <div class="row"><dt>Charging</dt><dd>USB-C<small>And wireless</small></dd></div>
+        <div class="row"><dt>Water resistance</dt><dd>IPX5<small>Sweat and rain</small></dd></div>
+        <div class="row"><dt>Weight</dt><dd>4.6 g<small>Per bud</small></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="band colors">
+    <div class="wrap">
+      <h2>Three finishes</h2>
+      <div class="swatches">
+        <div class="swatch" style="--shell:#1d1d20;--hi:#4a4a50;--ring:#c8875a"><div class="bud"></div><div><h3>Graphite</h3><p>Copper ring</p></div></div>
+        <div class="swatch" style="--shell:#b9b2a6;--hi:#ece6dc;--ring:#c9ccd1"><div class="bud"></div><div><h3>Bone</h3><p>Silver ring</p></div></div>
+        <div class="swatch" style="--shell:#141c2e;--hi:#3a4a6b;--ring:#d7b46a"><div class="bud"></div><div><h3>Midnight Blue</h3><p>Gold ring</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band cta" id="preorder">
+    <div class="wrap">
+      <h2>ORBO One. <span>$179.</span></h2>
+      <div class="actions">
+        <button class="btn" id="preorder-btn" type="button">Preorder</button>
+        <a class="btn ghost" href="#inside">Look inside again</a>
+      </div>
+      <p id="preorder-note" hidden>Preorders aren't open. ORBO is a design study, so there is nothing to buy yet.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>ORBO is a fictional brand made for a design study. Not a real product.</span>
+    <span>Rendered in Blender</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const FRAMES = 120;
+  // Part of the render to show: the stack sits in the middle of a 16:9 frame.
+  // On a phone the crop is tighter and the product moves left, so the
+  // labels can all sit on its right.
+  const CROP_WIDE = { x: 0.28, y: 0.0, w: 0.44, h: 1.0 };
+  const CROP_NARROW = { x: 0.39, y: 0.0, w: 0.22, h: 1.0 };
+  let CROP = CROP_WIDE;
+  // Scroll progress -> animation frame. The exploded pose holds longer
+  // than in the raw render so the labels can be read.
+  const KEYS = [[0, 1], [0.06, 1], [0.12, 16], [0.42, 62], [0.70, 80], [0.90, 112], [1, 120]];
+  // When each label shows, in scroll progress.
+  const SHOW = { cap: [0.30, 0.72], upper: [0.33, 0.72], pcb: [0.36, 0.72], battery: [0.39, 0.72], driver: [0.42, 0.72] };
+
+  const stage = document.getElementById("stage");
+  const track = document.getElementById("inside");
+  const canvas = document.getElementById("frame");
+  const ctx = canvas.getContext("2d");
+  const svg = document.getElementById("callouts");
+  const intro = document.getElementById("intro");
+  const outro = document.getElementById("outro");
+  const meter = document.getElementById("meter");
+  const labels = [...document.querySelectorAll(".label")];
+
+  const pad = n => String(n).padStart(4, "0");
+  const imgs = Array.from({ length: FRAMES }, (_, i) => {
+    const im = new Image();
+    im.decoding = "async";
+    im.src = `frames/f_${pad(i + 1)}.webp`;
+    return im;
+  });
+  let parts = null;
+  fetch("track.json").then(r => r.json()).then(d => { parts = d.parts; draw(); }).catch(() => {});
+
+  labels.forEach(() => meter.appendChild(document.createElement("span")));
+  const ticks = [...meter.children];
+
+  const NS = "http://www.w3.org/2000/svg";
+  const lines = labels.map(() => {
+    const g = document.createElementNS(NS, "g");
+    g.innerHTML = '<line></line><circle r="2.5"></circle>';
+    g.style.transition = "opacity .35s";
+    svg.appendChild(g);
+    return g;
+  });
+
+  let box = { x: 0, y: 0, w: 0, h: 0 };
+  function layout() {
+    const vw = stage.clientWidth, vh = stage.clientHeight;
+    const narrow = vw < 760;
+    CROP = narrow ? CROP_NARROW : CROP_WIDE;
+    const srcW = 960 * CROP.w, srcH = 540 * CROP.h;
+    let h = vh * (narrow ? 0.8 : 0.96), w = h * srcW / srcH;
+    if (!narrow && w > vw * 0.9) { w = vw * 0.9; h = w * srcH / srcW; }
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    const x = narrow ? vw * 0.30 - w / 2 : vw * 0.56 - w / 2;
+    const y = (vh - h) / 2;
+    canvas.style.left = x + "px";
+    canvas.style.top = y + "px";
+    box = { x, y, w, h, narrow, vw };
+    draw();
+  }
+
+  function progress() {
+    const r = track.getBoundingClientRect();
+    const total = track.offsetHeight - stage.clientHeight;
+    return Math.min(1, Math.max(0, -r.top / total));
+  }
+
+  function frameAt(p) {
+    for (let i = 1; i < KEYS.length; i++) {
+      const [p1, f1] = KEYS[i];
+      const [p0, f0] = KEYS[i - 1];
+      if (p <= p1) {
+        const t = p1 === p0 ? 1 : (p - p0) / (p1 - p0);
+        return Math.round(f0 + (f1 - f0) * t);
+      }
+    }
+    return FRAMES;
+  }
+
+  // Normalized render coordinates -> stage pixels.
+  function toStage([nx, ny]) {
+    return [box.x + (nx - CROP.x) / CROP.w * box.w, box.y + (ny - CROP.y) / CROP.h * box.h];
+  }
+
+  let lastFrame = 0;
+  function draw() {
+    const p = progress();
+    const f = frameAt(p);
+    let im = imgs[f - 1];
+    if (!im.complete || !im.naturalWidth) {
+      // Not loaded yet: keep the nearest frame that is.
+      im = imgs[lastFrame ? lastFrame - 1 : 0];
+    } else {
+      lastFrame = f;
+    }
+    if (im && im.complete && im.naturalWidth) {
+      const sw = im.naturalWidth, sh = im.naturalHeight;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(im, CROP.x * sw, CROP.y * sh, CROP.w * sw, CROP.h * sh, 0, 0, canvas.width, canvas.height);
+    }
+
+    const introOut = Math.min(1, Math.max(0, (p - 0.04) / 0.08));
+    intro.style.opacity = 1 - introOut;
+    intro.style.transform = `translateY(${-introOut * 24}px)`;
+    outro.classList.toggle("on", p > 0.84);
+    meter.style.opacity = p > 0.12 && p < 0.9 ? 1 : 0;
+
+    labels.forEach((el, i) => {
+      const part = el.dataset.part;
+      const [a, b] = SHOW[part];
+      const on = p >= a && p < b && parts;
+      el.classList.toggle("on", !!on);
+      ticks[i].classList.toggle("on", !!on);
+      lines[i].style.opacity = on ? 1 : 0;
+      if (!parts) return;
+      const [px, py] = toStage(parts[part][(lastFrame || 1) - 1]);
+      const right = box.narrow || el.classList.contains("right");
+      if (box.narrow) el.style.width = Math.max(110, box.vw - (box.x + box.w * 0.9) - 12) + "px";
+      const lw = el.offsetWidth;
+      let lx = box.narrow ? box.x + box.w * 0.9
+        : right ? box.x + box.w * 0.62 + 70 : box.x + box.w * 0.38 - 70 - lw;
+      el.style.textAlign = right ? "left" : "right";
+      lx = Math.max(12, Math.min(box.vw - lw - 12, lx));
+      const ly = py - 12;
+      el.style.left = lx + "px";
+      el.style.top = ly + "px";
+      const ln = lines[i].firstChild, dot = lines[i].lastChild;
+      const ex = right ? lx - 10 : lx + lw + 10;
+      ln.setAttribute("x1", px); ln.setAttribute("y1", py);
+      ln.setAttribute("x2", ex); ln.setAttribute("y2", py);
+      dot.setAttribute("cx", px); dot.setAttribute("cy", py);
+    });
+  }
+
+  let queued = false;
+  const onScroll = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => { queued = false; draw(); });
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", layout);
+  imgs[0].onload = layout;
+  layout();
+
+  const btn = document.getElementById("preorder-btn");
+  btn.addEventListener("click", () => { document.getElementById("preorder-note").hidden = false; });
+})();
+</script>
+</body>
+</html>

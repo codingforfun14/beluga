@@ -11,7 +11,7 @@ ORBO e' un marchio inventato per uno studio di design. Prezzi e dati tecnici son
 | Testo secondario | `#8A8680` | grigio caldo |
 | Accento | `#C8875A` | rame, lo stesso dell'anello dell'auricolare |
 
-Font (gia' nel reference pack, licenza OFL): **Unbounded** per titoli e logo, **Inter** per il testo.
+Font (Google Fonts, licenza OFL): **Unbounded** per titoli e logo, **Hanken Grotesk** per il testo, **IBM Plex Mono** per le etichette tecniche.
 
 ## Hero
 

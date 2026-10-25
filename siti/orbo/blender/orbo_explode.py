@@ -213,10 +213,35 @@ def animate(root, parts):
             kp.interpolation = "LINEAR"
 
 
+def write_track(scene, parts, path):
+    """Per ogni frame, il centro di ogni pezzo in coordinate schermo (0-1,
+    origine in alto a sinistra). Il sito lo usa per agganciare le etichette."""
+    import json
+    from bpy_extras.object_utils import world_to_camera_view
+    from mathutils import Vector
+
+    def centre(group):
+        pts = []
+        for child in group.children_recursive:
+            if child.type in {"MESH", "FONT"}:
+                pts += [child.matrix_world @ Vector(c) for c in child.bound_box]
+        return sum(pts, Vector()) / len(pts)
+
+    out = {"frames": FRAMES, "parts": {k: [] for k in parts}}
+    for f in range(1, FRAMES + 1):
+        scene.frame_set(f)
+        for name, group in parts.items():
+            co = world_to_camera_view(scene, scene.camera, centre(group))
+            out["parts"][name].append([round(co.x, 4), round(1 - co.y, 4)])
+    with open(path, "w") as fh:
+        json.dump(out, fh, separators=(",", ":"))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ap.add_argument("--still", type=int)
+    ap.add_argument("--track", help="scrive in JSON la posizione a schermo dei pezzi")
     ap.add_argument("--frames", type=int, nargs=2, default=(1, FRAMES))
     ap.add_argument("--step", type=int, default=1)
     ap.add_argument("--samples", type=int, default=64)
@@ -241,6 +266,9 @@ def main():
     scene.cycles.use_denoising = True
     scene.render.resolution_x, scene.render.resolution_y = args.res
     scene.render.image_settings.file_format = "PNG"
+    if args.track:
+        write_track(scene, parts, args.track)
+        return
     if args.still:
         scene.frame_set(args.still)
         scene.render.filepath = args.out
