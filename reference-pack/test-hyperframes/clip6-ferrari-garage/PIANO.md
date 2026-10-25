@@ -7,19 +7,26 @@ Richiesta di fede (2026-10-25): un garage buio, un drone che entra, un'auto cope
 ## L'idea
 Il buio e il silenzio sono la promessa, il rosso è la ricompensa. Per 12 secondi non si vede la macchina: si sente e si intuisce. Il drone è il nostro sguardo curioso. Quando il telo scivola via, il garage si accende con lei.
 
-## Scaletta (25 s, 16:9; versione 9:16 ricavabile)
-| s | Cosa si vede | Cosa si muove nel garage |
+## Scaletta v2 (30 s, 16:9; versione 9:16 ricavabile), con l'idea di fede dell'abitacolo
+| s | Cosa si vede | Cosa si muove |
 |---|---|---|
 | 0–3 | nero; una lama di luce sotto la saracinesca che si alza di un metro | polvere che entra con l'aria, la luce che corre sul cemento |
-| 3–6 | il drone entra rasoterra controluce (camera fissa bassa, lui si avvicina) | eliche che sollevano polvere, LED rosso e verde, riflessi nelle pozze |
-| 6–9 | **POV del drone** (FPV): vola tra cassettiera, gomme, scaffali; il faro scivola sugli oggetti | un neon si accende tremolando, un cavo che oscilla, una goccia che cade in una pozza |
-| 9–12 | il faro trova la sagoma sotto il telo; orbita lenta attorno alla macchina coperta | il vento delle eliche fa vibrare il telo (simulazione cloth) |
-| 12–15 | il drone aggancia il telo e lo tira: il telo scivola dal muso alla coda e cade a terra | simulazione cloth vera; polvere che si alza dal telo |
-| 15–19 | **rivelazione**: la 488 rossa; luce che corre sulla carrozzeria; 3 dettagli da 1 s (faro, presa d'aria laterale, cerchio con pinza) | i neon si accendono tutti in sequenza, riflessi che scorrono sulla vernice |
-| 19–23 | eroe: camera bassa 3/4 che gira lentamente; il drone si allontana verso la saracinesca | luce del giorno dalla saracinesca, nebbia leggera |
-| 23–25 | end card (HyperFrames): claim e spazio per il logo | l'auto resta sullo sfondo, sfocata |
+| 3–6 | il drone entra rasoterra controluce | eliche che sollevano polvere, LED rosso e verde, riflessi nelle pozze |
+| 6–9 | **POV del drone** tra cassettiera, gomme e scaffali, il faro scivola sugli oggetti | un neon si accende tremolando, un cavo che oscilla, una goccia in una pozza |
+| 9–12 | il faro trova la sagoma sotto il telo; orbita lenta | il vento delle eliche fa vibrare il telo |
+| 12–15 | il drone aggancia il telo e lo tira: scivola dal muso alla coda e cade | simulazione cloth, polvere che si alza |
+| 15–18 | **rivelazione**: la 488 rossa, luce che corre sulla carrozzeria, i neon si accendono in sequenza | riflessi che scorrono sulla vernice |
+| 18–20 | il drone scende lungo la fiancata e **entra dal finestrino del guidatore** (vetro abbassato) | la camera passa dalla luce fredda del garage al rosso dell'abitacolo |
+| 20–22 | abitacolo rosso come nelle foto di fede: volante, sedili, il drone si avvicina al quadro | sul quadro si accendono le spie, la lancetta fa il giro di prova |
+| 22–24 | **zoom nel contagiri rosso**: la lancetta sale a fondo scala, lo schermo conta da 0 a **375 km/h** | il quadrante vibra, la zona rossa si accende |
+| 24–27 | **dal quadrante esce il diavolo**: linee al neon in 3D (corna, occhi obliqui, ghigno) che si disegnano e vengono verso la camera, scintille | motion design 3D in Blender con bagliore, il numero 375 resta sullo schermo |
+| 27–30 | end card (HyperFrames): claim e spazio per il logo, il diavolo si riduce a un segno | — |
 
-Ritmo: lento fino a 12 s (2 tagli), poi più veloce alla rivelazione (5 tagli in 7 s). È lo schema dei nostri test: tensione lunga, ricompensa rapida.
+**Velocità**: la 488 Spider dichiara una velocità massima di oltre 325 km/h (la GTB 330). Come chiesto, il quadro arriva a 50 in più: **375 km/h**. Il contagiri reale della 488 va a 10.000 giri e la velocità è sullo schermo digitale accanto; lo teniamo così, con il quadrante rosso (che esiste come optional, vedi la foto degli interni).
+
+**Abitacolo**: serve un modello con interni dettagliati (volante, quadro, sedili). Il quadro strumenti in primo piano lo rifaccio io in Blender (quadrante, tacche, lancetta animata, schermi con i numeri che salgono) perché nei modelli di solito è poco dettagliato e deve reggere un primo piano. Il diavolo è un nostro segno grafico (non è un marchio Ferrari), fatto con curve al neon animate in Blender.
+
+**Reference di fede** salvate in `reference/` (interni rossi, posteriore, tre quarti, studio nero).
 
 ## Il garage "vero e vivo"
 - **Spazio**: officina privata di 8 × 12 m con saracinesca, cemento lucido con macchie e pozze (riflessi), muri a blocchi, plafoniere neon, cassettiera, pile di gomme, scaffali, tubo dell'aria, prolunghe.
@@ -40,7 +47,7 @@ Rifarla da zero in Blender con la qualità di uno spot richiederebbe giorni e ve
 
 ## Tempi e carico sul Mac (modalità leggera: nice 19, 2 thread, blocchi con pausa)
 - Preparazione scena, modello, materiali e animazione: lavoro mio, render solo di prova.
-- Render finale: 25 s a **30 fps = 750 fotogrammi**, circa 6–12 s l'uno in Eevee con nebbia e riflessi, cioè **1,5–2,5 ore** in modalità leggera. A 24 fps (look più cinema) i fotogrammi sono 600, circa 1–2 ore.
+- Render finale: 30 s a **30 fps = 900 fotogrammi**, circa 6–12 s l'uno in Eevee con nebbia e riflessi, cioè **1,5–3 ore** in modalità leggera. A 24 fps (look più cinema) i fotogrammi sono 720, circa 1,2–2,4 ore.
 - 60 fps qui non lo consiglio: raddoppia il tempo e il calore senza vantaggi per uno spot di questo tipo.
 
 ## Tappe con screen
@@ -60,4 +67,5 @@ Rifarla da zero in Blender con la qualità di uno spot richiederebbe giorni e ve
 ## Fotogrammi di esempio
 - `progress/01-mood-drone-entra.jpg`: il drone entra controluce dalla saracinesca, la macchina coperta in primo piano.
 - `progress/02-mood-telo.jpg`: il faro del drone scopre la sagoma sotto il telo (simulazione cloth vera sulla sagoma con le proporzioni della 488).
+- `progress/03-mood-quadro-diavolo.jpg`: il contagiri rosso a fondo scala, 375 km/h sullo schermo, il diavolo al neon che esce dal quadrante.
 Sono un blockout: materiali, nebbia volumetrica e dettagli del garage vanno ancora fatti.
