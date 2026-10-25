@@ -47,7 +47,7 @@
       da_verificare: s.errore ? s.errore.messaggio : 'Da verificare.',
       annullato: 'Annullato da te.',
     }[s.stato];
-    if (s.risultato) t.ideas = s.risultato.idee.map(i => ({ name: i.titolo, line: i.hook, more: i.sviluppo, visual: i.direzione_visiva }));
+    if (s.risultato) t.ideas = s.risultato.idee.map(i => ({ name: i.titolo, line: i.hook, more: i.sviluppo, moment: i.momento, visual: i.direzione_visiva, plan: i.scaletta || [] }));
     return t;
   }
 
@@ -77,9 +77,11 @@
     const saved = s.risultato ? `<p class="detail">Salvato in ${esc(s.risultato.markdown)}${s.risultato.origine === 'manuale' ? ' · risposta incollata a mano' : ''}</p>` : '';
     const temp = s.agente && s.agente.temporaneo ? '<p class="detail">Claude fa l\'Ideatore solo per provare il collegamento. Non è ancora il flusso definitivo a due modelli.</p>' : '';
     if (s.stato === 'attesa_fede') {
-      return `<div class="ideas">${t.ideas.map((i, n) => `<label class="idea">
+      const br = s.risultato.brief;
+      const brief = br ? `<p class="detail brief"><b>Messaggio:</b> ${esc(br.messaggio)}<br><b>Insight:</b> ${esc(br.insight)}</p>` : '';
+      return `${brief}<div class="ideas">${t.ideas.map((i, n) => `<label class="idea">
           <input type="radio" name="pick-${t.id}" value="${n}" ${n === 0 ? 'checked' : ''}>
-          <span><strong>${esc(i.name)}</strong>${esc(i.line)}<small class="more">${esc(i.more)}</small><small class="more"><b>Visivo:</b> ${esc(i.visual)}</small></span>
+          <span><strong>${esc(i.name)}</strong>${esc(i.line)}<small class="more">${esc(i.more)}</small>${i.moment ? `<small class="more"><b>Il momento:</b> ${esc(i.moment)}</small>` : ''}<small class="more"><b>Visivo:</b> ${esc(i.visual)}</small>${i.plan.length ? `<small class="more plan"><b>Scaletta</b>${i.plan.map(x => `<i>${esc(x)}</i>`).join('')}</small>` : ''}</span>
         </label>`).join('')}</div>${saved}
         <div class="buttons"><button class="primary" data-approve="${t.id}">${icon('i-check')}Approva l'idea scelta</button><button class="soft" data-changes="${t.id}">Chiedi modifiche</button></div>`;
     }

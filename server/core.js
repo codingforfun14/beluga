@@ -99,7 +99,9 @@ function receive(body) {
     say('niko', r, task.id);
     return { risposta: r, task: task.id, doppio: true };
   }
-  const r = `Ricevuto. Lo passo all'Ideatore (${agentLabel(task)}). Ti scrivo qui quando c'è il risultato.`;
+  const r = task.agente && task.agente.programma === 'manuale'
+    ? 'Ricevuto. Ti preparo il prompt per l\'Ideatore: lo trovi qui tra un attimo.'
+    : `Ricevuto. Lo passo all'Ideatore (${agentLabel(task)}). Ti scrivo qui quando c'è il risultato.`;
   say('niko', r, task.id);
   return { risposta: r, task: task.id };
 }
@@ -117,9 +119,9 @@ function storeResult(t, testo, origine) {
   const dir = workDir(t);
   L.writeAtomic(path.join(dir, origine === 'manuale' ? 'risposta-manuale.txt' : 'risposta-agente.txt'), String(testo || ''));
   if (!v.ok) return v;
-  L.writeJSON(path.join(dir, 'idee.json'), { incarico: t.id, versione: t.versione, origine, creato: L.now(), idee: v.idee });
-  L.writeAtomic(path.join(dir, 'idee.md'), ideas.toMarkdown(t, v.idee, origine === 'manuale' ? 'risposta incollata a mano da Fede' : agentLabel(t)));
-  t.risultato = { file: rel(path.join(dir, 'idee.json')), markdown: rel(path.join(dir, 'idee.md')), origine, idee: v.idee };
+  L.writeJSON(path.join(dir, 'idee.json'), { incarico: t.id, versione: t.versione, origine, creato: L.now(), brief: v.brief, idee: v.idee });
+  L.writeAtomic(path.join(dir, 'idee.md'), ideas.toMarkdown(t, v.idee, origine === 'manuale' ? 'risposta incollata a mano da Fede' : agentLabel(t), v.brief));
+  t.risultato = { file: rel(path.join(dir, 'idee.json')), markdown: rel(path.join(dir, 'idee.md')), origine, brief: v.brief, idee: v.idee };
   return v;
 }
 

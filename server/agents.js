@@ -105,8 +105,9 @@ const fake = {
     if (mode === 'limite') return { ok: false, errore: { tipo: 'limite', messaggio: 'Limite del piano raggiunto.' } };
     if (mode === 'vuoto') return { ok: true, testo: '' };
     if (mode === 'rotto') return { ok: true, testo: 'Ecco tre idee: 1) ... 2) ... 3) ...' };
-    const idea = n => ({ titolo: `Idea di prova ${n}`, hook: `Hook di prova ${n}`, sviluppo: `Sviluppo di prova ${n}.`, direzione_visiva: `Direzione visiva di prova ${n}.` });
-    return { ok: true, testo: JSON.stringify({ idee: [idea(1), idea(2), idea(3)] }) };
+    const idea = n => ({ titolo: `Idea di prova ${n}`, hook: `Hook di prova ${n}`, sviluppo: `Sviluppo di prova ${n}.`, momento: `Momento di prova ${n}.`, direzione_visiva: `Direzione visiva di prova ${n}.`, scaletta: ['0-2 s: hook', '2-10 s: sviluppo', '10-15 s: chiusura'] });
+    const brief = { messaggio: 'Messaggio di prova', insight: 'Insight di prova', prova: 'Prova di prova' };
+    return { ok: true, testo: JSON.stringify({ brief, idee: [idea(1), idea(2), idea(3)] }) };
   },
 };
 

@@ -140,8 +140,16 @@ async function test(name, fn) {
     assert.ok(fs.existsSync(path.join(ROOT, 'projects/mezzeuro/work', id, 'v01', 'prompt.md')));
     assert.match((await get(`/api/lavori/${id}/piano-b`)).body.prompt, /budget mensile/);
     assert.ok(!fs.existsSync(path.join(ROOT, 'projects/mezzeuro/work', id, 'v01', 'risposta-agente.txt')), 'nessun agente deve aver risposto');
-    const idea = n => ({ titolo: `M${n}`, hook: `H${n}`, sviluppo: `S${n}`, direzione_visiva: `V${n}` });
-    const ok = await post(`/api/lavori/${id}/manuale`, { testo: JSON.stringify({ idee: [idea(1), idea(2), idea(3)] }) });
+    const idea = n => ({ titolo: `M${n}`, hook: `H${n}`, sviluppo: `S${n}`, momento: `Mo${n}`, direzione_visiva: `V${n}`, scaletta: ['0-2 s: a', '2-5 s: b'] });
+    const brief = { messaggio: 'M', insight: 'I', prova: 'P' };
+    const corta = await post(`/api/lavori/${id}/manuale`, { testo: JSON.stringify({ brief, idee: [idea(1), idea(2), idea(3)] }) });
+    assert.strictEqual(corta.code, 422, 'scaletta troppo corta va rifiutata');
+    assert.match(corta.body.errore, /scaletta/);
+    const senzaBrief = await post(`/api/lavori/${id}/manuale`, { testo: JSON.stringify({ idee: [idea(1), idea(2), idea(3)].map(i => ({ ...i, scaletta: ['a', 'b', 'c'] })) }) });
+    assert.match(senzaBrief.body.errore, /brief/);
+    const ok = await post(`/api/lavori/${id}/manuale`, { testo: JSON.stringify({ brief, idee: [idea(1), idea(2), idea(3)].map(i => ({ ...i, scaletta: ['0-2 s: a', '2-5 s: b', '5-9 s: c'] })) }) });
+    const testoMd = fs.readFileSync(path.join(ROOT, ok.body.task.risultato.markdown), 'utf8');
+    assert.match(testoMd, /## Brief/); assert.match(testoMd, /Scaletta/); assert.match(testoMd, /5-9 s: c/);
     assert.strictEqual(ok.body.task.stato, 'attesa_fede');
     const md = await post(`/api/lavori/${id}/modifica`, { testo: 'Più brevi' });
     assert.strictEqual(md.body.task.versione, 2);
@@ -200,8 +208,9 @@ async function test(name, fn) {
       assert.match(pb.body.prompt, /fondo|caso/);
       const bad = await post(`/api/lavori/${id}/manuale`, { testo: 'non è json' });
       assert.strictEqual(bad.code, 422);
-      const idea = n => ({ titolo: `T${n}`, hook: `Hook ${n}`, sviluppo: `Sviluppo ${n}`, direzione_visiva: `Visiva ${n}` });
-      const ok = await post(`/api/lavori/${id}/manuale`, { testo: '```json\n' + JSON.stringify({ idee: [idea(1), idea(2), idea(3)] }) + '\n```' });
+      const idea = n => ({ titolo: `T${n}`, hook: `Hook ${n}`, sviluppo: `Sviluppo ${n}`, momento: `Momento ${n}`, direzione_visiva: `Visiva ${n}`, scaletta: ['0-2 s: a', '2-5 s: b', '5-9 s: c'] });
+      const brief = { messaggio: 'M', insight: 'I', prova: 'P' };
+      const ok = await post(`/api/lavori/${id}/manuale`, { testo: '```json\n' + JSON.stringify({ brief, idee: [idea(1), idea(2), idea(3)] }) + '\n```' });
       assert.strictEqual(ok.body.task.stato, 'attesa_fede');
       assert.strictEqual(ok.body.task.risultato.origine, 'manuale');
       // nessun nuovo tentativo automatico: il log ha un solo "avviato"

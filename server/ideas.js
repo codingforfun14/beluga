@@ -4,7 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const { ROLES, PROJECTS, readJSON } = require('./lib');
 
-const FIELDS = ['titolo', 'hook', 'sviluppo', 'direzione_visiva'];
+const FIELDS = ['titolo', 'hook', 'sviluppo', 'momento', 'direzione_visiva'];
+const BRIEF = ['messaggio', 'insight', 'prova'];
 const read = f => { try { return fs.readFileSync(f, 'utf8').trim(); } catch { return ''; } };
 
 // Solo ciò che serve: skill del ruolo, contesto del progetto, libreria, file dell'incarico.
@@ -30,8 +31,9 @@ ${task.richiesta}
 
 # Formato della risposta (obbligatorio)
 Rispondi SOLO con un oggetto JSON valido, senza testo prima o dopo e senza blocchi di codice:
-{"idee":[{"titolo":"...","hook":"...","sviluppo":"...","direzione_visiva":"..."}]}
-Esattamente 3 idee. Tutti e quattro i campi pieni, in italiano.`;
+{"brief":{"messaggio":"...","insight":"...","prova":"..."},
+ "idee":[{"titolo":"...","hook":"...","sviluppo":"...","momento":"...","direzione_visiva":"...","scaletta":["0-2 s: ...","2-6 s: ..."]}]}
+Esattamente 3 idee. Tutti i campi pieni, in italiano. La scaletta ha da 3 a 10 beat, ognuno con i secondi.`;
 }
 
 // Trova il JSON anche se il modello aggiunge un blocco ```json o due parole attorno.
@@ -52,28 +54,49 @@ function validate(text) {
   const list = Array.isArray(data) ? data : data.idee;
   if (!Array.isArray(list)) return { ok: false, errore: 'Nella risposta manca la lista "idee".' };
   if (list.length !== 3) return { ok: false, errore: `Servono 3 idee, ne sono arrivate ${list.length}.` };
+  const b = Array.isArray(data) ? null : data.brief;
+  for (const f of BRIEF) {
+    if (!b || typeof b[f] !== 'string' || !b[f].trim()) return { ok: false, errore: `Nel brief manca il campo "${f}" o è vuoto.` };
+  }
   for (const [i, idea] of list.entries()) {
     for (const f of FIELDS) {
       const v = idea && idea[f];
       if (typeof v !== 'string' || !v.trim()) return { ok: false, errore: `Nell'idea ${i + 1} manca il campo "${f}" o è vuoto.` };
     }
+    const sc = idea.scaletta;
+    if (!Array.isArray(sc) || sc.length < 3 || sc.some(x => typeof x !== 'string' || !x.trim())) return { ok: false, errore: `Nell'idea ${i + 1} la scaletta deve avere almeno 3 beat scritti.` };
   }
-  return { ok: true, idee: list.map(i => Object.fromEntries(FIELDS.map(f => [f, i[f].trim()]))) };
+  return {
+    ok: true,
+    brief: Object.fromEntries(BRIEF.map(f => [f, b[f].trim()])),
+    idee: list.map(i => ({ ...Object.fromEntries(FIELDS.map(f => [f, i[f].trim()])), scaletta: i.scaletta.slice(0, 10).map(x => x.trim()) })),
+  };
 }
 
-function toMarkdown(task, idee, origine) {
+function toMarkdown(task, idee, origine, brief) {
   return `# ${task.titolo} · versione ${String(task.versione).padStart(2, '0')}
 
 Richiesta: ${task.richiesta}
 Fatto da: ${origine}
+${brief ? `
+## Brief
 
+- **Messaggio:** ${brief.messaggio}
+- **Insight:** ${brief.insight}
+- **Perché crederci:** ${brief.prova}
+` : ''}
 ${idee.map((i, n) => `## ${n + 1}. ${i.titolo}
 
 **Hook:** ${i.hook}
 
 ${i.sviluppo}
 
+**Il momento da raccontare:** ${i.momento}
+
 **Direzione visiva:** ${i.direzione_visiva}
+
+**Scaletta**
+${(i.scaletta || []).map(x => `- ${x}`).join('\n')}
 `).join('\n')}`;
 }
 
