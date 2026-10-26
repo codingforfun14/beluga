@@ -275,6 +275,7 @@ def studio(scene):
 def camera(scene, loc, target, lens=100):
     cam_data = bpy.data.cameras.new("cam")
     cam_data.lens = lens
+    cam_data.clip_start = 0.001
     cam_data.dof.use_dof = True
     cam_data.dof.aperture_fstop = 18
     cam = bpy.data.objects.new("cam", cam_data)

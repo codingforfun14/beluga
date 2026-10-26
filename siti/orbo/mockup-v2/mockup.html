@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ORBO One mockup v2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Geist:wght@300..600&display=swap">
+<style>
+/* Mockup del piano v2: cinque schermate 1440x900, una per sezione. */
+:root {
+  --black: #000;
+  --bone: #e9e4da;
+  --ink: #141312;
+  --paper: #f3efe8;
+  --copper: #c8875a;
+  --mist: #8f877d;
+  --display: "Bricolage Grotesque", system-ui, sans-serif;
+  --body: "Geist", system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; }
+.screen img { -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent 100%); mask-image: radial-gradient(closest-side, #000 62%, transparent 100%); }
+body { background: #222; font-family: var(--body); }
+.screen { width: 1440px; height: 900px; position: relative; overflow: hidden; color: var(--paper); background: var(--black); }
+.nav { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 26px 48px; z-index: 3; font-size: 14px; }
+.nav .mark { font: 700 22px/1 var(--display); font-stretch: 88%; letter-spacing: -0.01em; }
+.nav .links { display: flex; gap: 32px; align-items: center; opacity: .75; }
+.nav .bag { width: 34px; height: 34px; border-radius: 50%; border: 1px solid currentColor; display: grid; place-items: center; font-size: 12px; opacity: .9; }
+.light { background: var(--bone); color: var(--ink); }
+.light .nav { color: var(--ink); }
+
+/* 1. Pagina del pezzo */
+.part img { position: absolute; right: -300px; top: 40px; width: 1500px; }
+.part .copy { position: absolute; left: 96px; top: 220px; width: 560px; }
+.part .count { font: 400 15px var(--body); color: var(--mist); display: flex; gap: 14px; align-items: center; }
+.part .count i { display: inline-block; width: 28px; height: 2px; background: #3a3633; }
+.part .count i.on { background: var(--copper); width: 56px; }
+.part h2 { font: 600 112px/0.9 var(--display); font-stretch: 88%; letter-spacing: -0.035em; margin-top: 34px; }
+.part p { font-size: 21px; line-height: 1.5; color: #bdb5aa; margin-top: 30px; max-width: 26ch; }
+.part .wave { position: absolute; left: 96px; bottom: 60px; }
+
+/* 2. Peso */
+.weight { background: radial-gradient(60% 70% at 50% 62%, #4a2a17 0%, #1a0f08 45%, #000 80%); }
+.weight img { position: absolute; left: 50%; top: 220px; width: 1000px; transform: translateX(-50%); }
+.weight .num { position: absolute; left: 0; right: 0; top: 70px; text-align: center; font: 300 300px/1 var(--display); font-stretch: 88%; letter-spacing: -0.06em; font-variant-numeric: tabular-nums; color: var(--paper); }
+.weight .num span { color: var(--copper); font-size: .38em; letter-spacing: 0; margin-left: .06em; }
+.weight .cap { position: absolute; left: 0; right: 0; bottom: 44px; text-align: center; font-size: 22px; color: #d7c7b6; }
+.weight .cap b { font-weight: 500; color: var(--paper); }
+
+/* 3. Specifiche */
+.specs .head { position: absolute; left: 96px; top: 120px; display: flex; justify-content: space-between; right: 96px; align-items: end; }
+.specs h2 { font: 600 88px/0.92 var(--display); font-stretch: 88%; letter-spacing: -0.035em; }
+.specs .head p { max-width: 32ch; font-size: 18px; color: #5d574f; }
+.grid { position: absolute; left: 96px; right: 96px; top: 330px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.cell { background: var(--paper); border-radius: 28px; height: 230px; padding: 30px 32px; position: relative; overflow: hidden; }
+.cell .v { font: 600 52px/1 var(--display); font-stretch: 88%; letter-spacing: -0.02em; }
+.cell .l { font-size: 16px; color: #6b645b; margin-top: 10px; }
+.cell svg { position: absolute; right: 22px; bottom: 18px; }
+.cell.dark { background: var(--ink); color: var(--paper); }
+.cell.dark .l { color: #a39a8f; }
+
+/* 4. Finiture */
+.fin { background: radial-gradient(70% 80% at 50% 45%, #1b1a1d, #000 75%); }
+.fin img { position: absolute; left: 50%; top: 40px; width: 1360px; transform: translateX(-50%); }
+.fin .row { position: absolute; left: 96px; right: 96px; bottom: 80px; display: flex; justify-content: space-between; align-items: end; }
+.fin h2 { font: 600 76px/0.95 var(--display); font-stretch: 88%; letter-spacing: -0.03em; }
+.fin h2 em { font-style: normal; color: var(--copper); }
+.chips { display: flex; gap: 14px; }
+.chip { display: flex; align-items: center; gap: 12px; padding: 10px 18px 10px 10px; border-radius: 999px; border: 1px solid #333; font-size: 15px; }
+.chip.on { border-color: var(--paper); }
+.chip i { width: 30px; height: 30px; border-radius: 50%; box-shadow: inset 0 0 0 3px var(--ring); background: var(--shell); }
+
+/* 5. Acquisto */
+.buy img { position: absolute; left: -110px; top: 60px; width: 1000px; }
+.panel { position: absolute; right: 96px; top: 130px; width: 470px; }
+.panel h2 { font: 600 72px/0.95 var(--display); font-stretch: 88%; letter-spacing: -0.03em; }
+.panel .sub { color: #a9a197; font-size: 17px; margin-top: 12px; }
+.panel .price { display: flex; align-items: baseline; gap: 14px; margin-top: 34px; }
+.panel .price b { font: 500 44px var(--display); font-stretch: 85%; }
+.panel .price span { color: var(--mist); font-size: 15px; }
+.panel .label { margin-top: 30px; font-size: 15px; color: #cfc6ba; }
+.panel .chips { margin-top: 12px; }
+.panel .cta { margin-top: 30px; display: flex; gap: 12px; }
+.btn { background: var(--copper); color: #1a0e06; font: 500 17px var(--body); padding: 18px 30px; border-radius: 999px; }
+.btn.ghost { background: transparent; color: var(--paper); box-shadow: inset 0 0 0 1px #4a4540; }
+.perks { margin-top: 34px; display: grid; gap: 12px; font-size: 15px; color: #cfc6ba; }
+.perks div { display: flex; gap: 12px; align-items: center; }
+.perks svg { flex: none; }
+.box { position: absolute; left: 96px; right: 96px; bottom: 50px; display: flex; gap: 40px; border-top: 1px solid #2a2724; padding-top: 22px; font-size: 15px; color: #a9a197; }
+.box b { color: var(--paper); font-weight: 500; margin-right: 8px; }
+</style>
+</head>
+<body>
+
+<section class="screen part" id="m1">
+  <div class="nav"><span class="mark">ORBO</span><span class="links"><span>Inside</span><span>Sound</span><span>Specs</span><span class="bag">0</span></span></div>
+  <img src="driver.png" alt="">
+  <div class="copy">
+    <div class="count"><i></i><i></i><i></i><i></i><i class="on"></i> Part 5 of 5</div>
+    <h2>11 mm graphene driver</h2>
+    <p>A diaphragm stiff enough to stay clean at full volume, light enough to move in a whisper.</p>
+  </div>
+  <svg class="wave" width="520" height="60" viewBox="0 0 520 60" fill="none" stroke="#c8875a" stroke-width="1.5">
+    <path d="M0 30 Q 20 4 40 30 T 80 30 T 120 30 T 160 30 T 200 30 T 240 30 Q 260 18 280 30 T 320 30 Q 340 26 360 30 T 400 30 Q 420 29 440 30 L 520 30" />
+  </svg>
+</section>
+
+<section class="screen weight" id="m2">
+  <div class="nav"><span class="mark">ORBO</span><span class="links"><span>Inside</span><span>Sound</span><span>Specs</span><span class="bag">0</span></span></div>
+  <div class="num">4.6<span>g</span></div>
+  <img src="scale.png" alt="">
+  <div class="cap"><b>Lighter than one sheet of paper.</b> An A4 sheet weighs 5 g. One ORBO One weighs 4.6.</div>
+</section>
+
+<section class="screen light specs" id="m3">
+  <div class="nav"><span class="mark">ORBO</span><span class="links"><span>Inside</span><span>Sound</span><span>Specs</span><span class="bag">0</span></span></div>
+  <div class="head"><h2>The numbers,<br>moving.</h2><p>Each figure is drawn as what it measures: sound, silence, time, water.</p></div>
+  <div class="grid">
+    <div class="cell"><div class="v">11 mm</div><div class="l">Graphene driver</div>
+      <svg width="150" height="150" viewBox="0 0 150 150" fill="none" stroke="#141312"><circle cx="110" cy="110" r="14" stroke-width="2"/><circle cx="110" cy="110" r="32" opacity=".55"/><circle cx="110" cy="110" r="52" opacity=".3"/><circle cx="110" cy="110" r="74" opacity=".14"/></svg></div>
+    <div class="cell dark"><div class="v">−48 dB</div><div class="l">Adaptive noise cancelling</div>
+      <svg width="300" height="90" viewBox="0 0 300 90" fill="none" stroke="#c8875a" stroke-width="2"><path d="M0 45 L12 10 L24 78 L36 18 L48 70 L60 26 L72 62 L84 34 L96 56 L108 40 L120 50 L132 43 L144 47 L156 45 L300 45"/></svg></div>
+    <div class="cell"><div class="v">40 h</div><div class="l">With the case. 8 h in the buds.</div>
+      <svg width="130" height="130" viewBox="0 0 130 130" fill="none"><circle cx="65" cy="65" r="50" stroke="#d6cfc3" stroke-width="10"/><circle cx="65" cy="65" r="50" stroke="#141312" stroke-width="10" stroke-dasharray="250 314" transform="rotate(-90 65 65)" stroke-linecap="round"/></svg></div>
+    <div class="cell"><div class="v">10 min</div><div class="l">Charge for 2 hours of play</div>
+      <svg width="180" height="70" viewBox="0 0 180 70" fill="none" stroke="#141312" stroke-width="2"><rect x="20" y="20" width="110" height="30" rx="15"/><rect x="130" y="28" width="30" height="14" rx="3"/><path d="M40 35 H 70" stroke="#c8875a" stroke-width="6" stroke-linecap="round"/></svg></div>
+    <div class="cell"><div class="v">IPX5</div><div class="l">Sweat and rain</div>
+      <svg width="140" height="120" viewBox="0 0 140 120" fill="#141312"><path d="M100 20 C 112 40 120 50 120 62 a20 20 0 0 1 -40 0 c0-12 8-22 20-42z"/><path d="M50 60 C 57 72 62 78 62 85 a12 12 0 0 1 -24 0 c0-7 5-13 12-25z" opacity=".5"/></svg></div>
+    <div class="cell dark"><div class="v">6</div><div class="l">Microphones, 3 per bud</div>
+      <svg width="170" height="60" viewBox="0 0 170 60" fill="#c8875a"><circle cx="20" cy="30" r="6"/><circle cx="46" cy="30" r="6"/><circle cx="72" cy="30" r="6"/><circle cx="110" cy="30" r="6" opacity=".5"/><circle cx="136" cy="30" r="6" opacity=".5"/><circle cx="162" cy="30" r="6" opacity=".5"/></svg></div>
+  </div>
+</section>
+
+<section class="screen fin" id="m4">
+  <div class="nav"><span class="mark">ORBO</span><span class="links"><span>Inside</span><span>Sound</span><span>Specs</span><span class="bag">0</span></span></div>
+  <img src="finishes.png" alt="">
+  <div class="row">
+    <h2>Graphite,<br>with a <em>copper</em> ring.</h2>
+    <div class="chips">
+      <div class="chip on" style="--shell:#1d1d20;--ring:#c8875a"><i></i>Graphite</div>
+      <div class="chip" style="--shell:#b9b2a6;--ring:#c9ccd1"><i></i>Bone</div>
+      <div class="chip" style="--shell:#141c2e;--ring:#d7b46a"><i></i>Midnight</div>
+    </div>
+  </div>
+</section>
+
+<section class="screen buy" id="m5">
+  <div class="nav"><span class="mark">ORBO</span><span class="links"><span>Inside</span><span>Sound</span><span>Specs</span><span class="bag">0</span></span></div>
+  <img src="case.png" alt="">
+  <div class="panel">
+    <h2>ORBO One</h2>
+    <p class="sub">Wireless earbuds with adaptive noise cancelling.</p>
+    <div class="price"><b>$179</b><span>or $14.92/mo for 12 months</span></div>
+    <div class="label">Finish: Graphite</div>
+    <div class="chips">
+      <div class="chip on" style="--shell:#1d1d20;--ring:#c8875a"><i></i>Graphite</div>
+      <div class="chip" style="--shell:#b9b2a6;--ring:#c9ccd1"><i></i>Bone</div>
+      <div class="chip" style="--shell:#141c2e;--ring:#d7b46a"><i></i>Midnight</div>
+    </div>
+    <div class="cta"><span class="btn">Add to bag</span><span class="btn ghost">Compare</span></div>
+    <div class="perks">
+      <div><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#c8875a" stroke-width="1.5"><path d="M1 5h10v8H1zM11 8h4l2 3v2h-6z"/><circle cx="4" cy="14" r="1.5"/><circle cx="14" cy="14" r="1.5"/></svg>Free delivery in 2 to 4 days</div>
+      <div><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#c8875a" stroke-width="1.5"><path d="M3 9a6 6 0 1 0 2-4.5M3 2v3h3"/></svg>30 nights to try them, free returns</div>
+      <div><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#c8875a" stroke-width="1.5"><path d="M9 1l6 3v5c0 4-3 6.5-6 8-3-1.5-6-4-6-8V4z"/></svg>2-year warranty</div>
+    </div>
+  </div>
+  <div class="box"><span><b>In the box</b></span><span>2 earbuds</span><span>Charging case</span><span>Tips in S, M, L</span><span>USB-C cable</span></div>
+</section>
+
+</body>
+</html>

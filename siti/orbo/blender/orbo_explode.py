@@ -44,7 +44,7 @@ def build_parts(mats):
     smd_mat = om.material("smd", (0.55, 0.5, 0.42), 0.3, metal=1.0)
     steel = om.material("steel", (0.62, 0.62, 0.64), 0.28, metal=1.0, aniso=0.5)
     gold = om.material("gold", (0.95, 0.74, 0.42), 0.2, metal=1.0)
-    cone_mat = om.material("cone", (0.02, 0.02, 0.022), 0.55, coat=0.3)
+    cone_mat = om.material("cone", (0.012, 0.012, 0.013), 0.4, coat=0.6, coat_rough=0.15)
 
     parts = {}
 
@@ -123,6 +123,11 @@ def build_parts(mats):
                              (0.0018, -0.0062)])
     om.assign(coil, mats["metal"])
     coil.parent = driver
+    magnet = om.lathe("magnet", [(0.0, -0.0080), (0.0036, -0.0080),
+                                 (0.0038, -0.0078), (0.0038, -0.0064),
+                                 (0.0036, -0.0062), (0.0, -0.0062)])
+    om.assign(magnet, om.material("chrome", (0.9, 0.9, 0.92), 0.08, metal=1.0))
+    magnet.parent = driver
     parts["driver"] = driver
 
     # 6. Guscio inferiore con becco e contatti di ricarica.
