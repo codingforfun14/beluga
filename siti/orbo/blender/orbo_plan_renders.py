@@ -133,7 +133,7 @@ def shot_chip(scene):
     return (0.005, -0.064, 0.038), tuple(target), 100
 
 
-def shot_scale2(scene):
+def shot_scale2(scene, digits_on=True, bud_z=-0.0005):
     body_m = om.material("anodized", (0.05, 0.05, 0.055), 0.34, metal=1.0, aniso=0.6)
     steel = om.material("plate", (0.38, 0.38, 0.40), 0.38, metal=1.0, aniso=0.8)
     glass = om.material("lcd", (0.003, 0.003, 0.004), 0.05, coat=1.0, coat_rough=0.02)
@@ -156,8 +156,9 @@ def shot_scale2(scene):
     em.inputs["Strength"].default_value = 6
     digits.node_tree.links.new(em.outputs[0],
                                digits.node_tree.nodes["Material Output"].inputs[0])
-    oe.text("4.60", 0.011, (-0.003, -0.040, -0.01555), digits, None)
-    oe.text("g", 0.006, (0.019, -0.0415, -0.01555), digits, None)
+    if digits_on:
+        oe.text("4.60", 0.011, (-0.003, -0.040, -0.01555), digits, None)
+        oe.text("g", 0.006, (0.019, -0.0415, -0.01555), digits, None)
     label = om.material("print", (0.5, 0.5, 0.5), 0.6)
     for x, word in ((-0.044, "ON"), (0.044, "TARE")):
         b = om.lathe("btn", [(0.0, -0.016), (0.0045, -0.016), (0.0047, -0.0157),
@@ -168,7 +169,8 @@ def shot_scale2(scene):
     oe.text("ORBO LAB  0.01 g", 0.0024, (0, -0.0505, -0.01595), label, None)
     bud = om.build_bud("bud", om.make_materials())
     bud.rotation_euler = (math.radians(70), 0, math.radians(-30))
-    bud.location = (0, 0.012, -0.0005)
+    bud.location = (0, 0.012, bud_z)
+    scene["scale_bud"] = bud.name
     return (0.0, -0.30, 0.20), (0, 0.004, -0.014), 85
 
 
@@ -209,8 +211,32 @@ def shot_finish(name):
     return shot
 
 
+def part_shot(keep, rot, cam, lens=100, fill=0.10, spec=0.25):
+    def shot(scene):
+        mats = om.make_materials()
+        _, parts = oe.build_parts(mats)
+        isolate(parts, keep)
+        g = parts[keep]
+        g.rotation_euler = rot
+        bpy.context.view_layer.update()
+        pts = [c.matrix_world @ Vector(v) for c in g.children_recursive
+               if c.type in {"MESH", "FONT"} for v in c.bound_box]
+        target = sum(pts, Vector()) / len(pts)
+        loc = target + Vector(cam)
+        om.area("fill", tuple(target + Vector((0.04, -0.07, 0.08))), tuple(target),
+                0.10, fill, size_y=0.05)
+        om.area("spec", tuple(target + Vector((-0.05, 0.03, 0.06))), tuple(target),
+                0.03, spec, size_y=0.08, color=(1.0, 0.9, 0.8))
+        return tuple(loc), tuple(target), lens
+    return shot
+
+
 SHOTS = {"driver": shot_driver, "finishes": shot_finishes, "scale": shot_scale,
          "chip": shot_chip, "scale2": shot_scale2,
+         "part_cap": part_shot("cap", (math.radians(38), 0, math.radians(-12)), (0.004, -0.060, 0.036)),
+         "part_upper": part_shot("upper", (math.radians(16), 0, math.radians(-150)), (0.004, -0.070, 0.040)),
+         "part_battery": part_shot("battery", (math.radians(40), 0, math.radians(-20)), (0.004, -0.050, 0.030), spec=0.10),
+         "part_driver": part_shot("driver", (math.radians(-140), 0, math.radians(20)), (0.004, -0.055, 0.030), fill=0.16, spec=0.07),
          "finish_graphite": shot_finish("graphite"), "finish_bone": shot_finish("bone"),
          "finish_midnight": shot_finish("midnight"),
          "case": shot_case}
@@ -226,7 +252,7 @@ def main():
 
     scene = om.reset_scene()
     floor = om.studio(scene)
-    if args.shot in ("driver", "chip") or args.shot.startswith("finish_"):
+    if args.shot in ("driver", "chip") or args.shot.startswith(("finish_", "part_")):
         bpy.data.objects.remove(floor)
     elif args.shot == "scale2":
         floor.location.z = -0.032

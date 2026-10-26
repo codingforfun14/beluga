@@ -171,6 +171,14 @@ def build_parts(mats):
     mic.rotation_euler = (0, math.radians(68), 0)
     om.assign(mic, mats["grille"])
     mic.parent = upper
+    for ang, z in ((150, 0.0034), (250, 0.0022)):
+        m2 = mic.copy()
+        m2.data = mic.data
+        bpy.context.collection.objects.link(m2)
+        r = math.radians(ang)
+        m2.location = (0.0095 * math.cos(r) * 0.98, 0.0086 * math.sin(r), z)
+        m2.rotation_euler = (0, math.radians(68), r)
+        m2.parent = upper
     parts["upper"] = upper
 
     # 3. Scheda con il chip S1.
@@ -185,6 +193,14 @@ def build_parts(mats):
                              (0.0054, 0.0021), (0.0, 0.0021)])
     om.assign(cell, steel)
     cell.parent = battery
+    ink = om.material("battery_print", (0.012, 0.012, 0.014), 0.85)
+    text("ORBO", 0.0012, (0, 0.0013, 0.00211), ink, battery)
+    text("Li-ion 3.85 V", 0.0007, (0, -0.0002, 0.00211), ink, battery)
+    text("62 mAh", 0.0007, (0, -0.0013, 0.00211), ink, battery)
+    nickel = om.material("nickel", (0.7, 0.68, 0.62), 0.3, metal=1.0)
+    box("tab_pos", (0.0062, 0.0, 0.0021), (0.0034, 0.0016, 0.00008), nickel, battery)
+    box("tab_neg", (-0.0062, 0.0, -0.0015), (0.0034, 0.0016, 0.00008), nickel,
+        battery)
     parts["battery"] = battery
 
     # 5. Driver: cestello, membrana a cono, bobina in rame.
@@ -204,6 +220,15 @@ def build_parts(mats):
                              (0.0018, -0.0062)])
     om.assign(coil, mats["metal"])
     coil.parent = driver
+    dome = om.lathe("dome", [(0.0, -0.0049), (0.0008, -0.0050), (0.0014, -0.0052),
+                             (0.0017, -0.00525)])
+    oe_solid = dome.modifiers.new("solid", "SOLIDIFY")
+    oe_solid.thickness = 0.0001
+    om.assign(dome, mats["metal"])
+    dome.parent = driver
+    for side in (-1, 1):
+        box("lead", (side * 0.0040, 0.0, -0.0058), (0.0040, 0.00012, 0.00012),
+            mats["metal"], driver)
     magnet = om.lathe("magnet", [(0.0, -0.0080), (0.0036, -0.0080),
                                  (0.0038, -0.0078), (0.0038, -0.0064),
                                  (0.0036, -0.0062), (0.0, -0.0062)])
