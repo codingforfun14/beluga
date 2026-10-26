@@ -35,6 +35,109 @@ def solid(obj, thickness):
     mod.use_even_offset = True
 
 
+def text(body, size, loc, mat, par, rot_z=0.0):
+    curve = bpy.data.curves.new("txt_" + body, "FONT")
+    curve.body = body
+    curve.align_x = "CENTER"
+    curve.align_y = "CENTER"
+    curve.size = size
+    curve.extrude = 0.000004
+    obj = bpy.data.objects.new("txt_" + body, curve)
+    bpy.context.collection.objects.link(obj)
+    obj.location = loc
+    obj.rotation_euler = (0, 0, rot_z)
+    om.assign(obj, mat)
+    obj.parent = par
+    return obj
+
+
+def box(name, loc, size, mat, par, bevel=0.0, rot_z=0.0):
+    bpy.ops.mesh.primitive_cube_add(size=1, location=loc)
+    obj = bpy.context.active_object
+    obj.name = name
+    obj.scale = size
+    obj.rotation_euler = (0, 0, rot_z)
+    if bevel:
+        mod = obj.modifiers.new("bevel", "BEVEL")
+        mod.width = bevel
+        mod.segments = 3
+    om.assign(obj, mat)
+    obj.parent = par
+    return obj
+
+
+def build_pcb(pcb, pcb_mat, chip_mat, smd_mat, gold):
+    """Scheda rotonda: chip S1 con scritta, piste di rame, pad dorati,
+    condensatori, quarzo e cavo flessibile."""
+    top = 0.0040
+    board = om.lathe("board", [(0.0, 0.0034), (0.0078, 0.0034),
+                               (0.0078, top), (0.0, top)], segments=128)
+    om.assign(board, pcb_mat)
+    board.parent = pcb
+    rim = om.lathe("rim", [(0.0072, top), (0.0078, top), (0.0078, top + 0.00003),
+                           (0.0072, top + 0.00003)], segments=128)
+    om.assign(rim, gold)
+    rim.parent = pcb
+
+    copper = om.material("copper_trace", (0.85, 0.5, 0.32), 0.3, metal=1.0)
+    label = om.material("laser", (0.16, 0.16, 0.17), 0.75)
+    ceramic = om.material("ceramic", (0.42, 0.33, 0.22), 0.5)
+    tin = om.material("tin", (0.75, 0.75, 0.76), 0.25, metal=1.0)
+    amber = om.material("polyimide", (0.75, 0.38, 0.06), 0.35, coat=0.6)
+
+    # Chip principale con la scritta incisa.
+    box("chip_S1", (0, 0.0004, top + 0.0004), (0.0040, 0.0040, 0.0008), chip_mat,
+        pcb, bevel=0.00012)
+    text("ORBO", 0.00062, (0, 0.0009, top + 0.000801), label, pcb)
+    text("S1", 0.0011, (0, -0.0001, top + 0.000801), label, pcb)
+    text("2611 A7", 0.00028, (0, -0.0011, top + 0.000801), label, pcb)
+
+    # Piste: dal bordo del chip ai pad sul perimetro, a L.
+    n = 28
+    for i in range(n):
+        a = 2 * math.pi * (i + 0.5) / n
+        ca, sa = math.cos(a), math.sin(a)
+        r0, r1 = 0.0026, 0.0063
+        mid = 0.0043
+        p0 = (r0 * ca, r0 * sa + 0.0004)
+        p1 = (mid * ca, mid * sa + 0.0004)
+        bend = a + 0.18
+        p2 = (r1 * math.cos(bend), r1 * math.sin(bend) + 0.0002)
+        for (x0, y0), (x1, y1) in ((p0, p1), (p1, p2)):
+            length = math.hypot(x1 - x0, y1 - y0)
+            box("trace", ((x0 + x1) / 2, (y0 + y1) / 2, top + 0.000015),
+                (length, 0.00011, 0.00003), copper, pcb,
+                rot_z=math.atan2(y1 - y0, x1 - x0))
+        pad = om.lathe("pad", [(0.0, 0.0), (0.00022, 0.0), (0.00022, 0.00004),
+                               (0.0, 0.00004)], segments=16)
+        pad.location = (p2[0], p2[1], top)
+        om.assign(pad, gold)
+        pad.parent = pcb
+
+    # Chip di memoria, quarzo, condensatori.
+    box("mem", (0.0042, -0.0030, top + 0.00025), (0.0016, 0.0022, 0.0005),
+        chip_mat, pcb, bevel=0.00008, rot_z=0.5)
+    box("xtal", (-0.0040, -0.0032, top + 0.0003), (0.0018, 0.0011, 0.0006),
+        tin, pcb, bevel=0.0002, rot_z=-0.4)
+    caps = [(-0.0046, 0.0018, 0.3), (-0.0050, 0.0004, 0.3), (0.0047, 0.0022, -0.2),
+            (0.0034, 0.0044, 1.1), (-0.0022, 0.0050, 1.6), (0.0006, -0.0047, 0.0),
+            (-0.0012, -0.0049, 0.0), (0.0052, -0.0006, 1.4)]
+    for x, y, rz in caps:
+        box("cap_body", (x, y, top + 0.00016), (0.0006, 0.0003, 0.0003), ceramic,
+            pcb, rot_z=rz)
+        for e in (-1, 1):
+            box("cap_end", (x + e * 0.00026 * math.cos(rz),
+                            y + e * 0.00026 * math.sin(rz), top + 0.00016),
+                (0.00012, 0.00032, 0.00032), tin, pcb, rot_z=rz)
+
+    # Cavo flessibile che esce dal bordo.
+    box("flex", (0.0, -0.0084, top - 0.00025), (0.0024, 0.0040, 0.00008), amber,
+        pcb)
+    for k in range(5):
+        box("flex_pin", (-0.0008 + k * 0.0004, -0.0098, top - 0.0002),
+            (0.00018, 0.0010, 0.00002), gold, pcb)
+
+
 def build_parts(mats):
     root = bpy.data.objects.new("ORBO_explode", None)
     bpy.context.collection.objects.link(root)
@@ -72,29 +175,7 @@ def build_parts(mats):
 
     # 3. Scheda con il chip S1.
     pcb = group("pcb", root)
-    board = om.lathe("board", [(0.0, 0.0034), (0.0078, 0.0034),
-                               (0.0078, 0.0040), (0.0, 0.0040)], segments=96)
-    om.assign(board, pcb_mat)
-    board.parent = pcb
-    bpy.ops.mesh.primitive_cube_add(size=1, location=(0.0, 0.0, 0.0044))
-    chip = bpy.context.active_object
-    chip.scale = (0.0042, 0.0042, 0.0008)
-    bev = chip.modifiers.new("bevel", "BEVEL")
-    bev.width = 0.00015
-    bev.segments = 3
-    om.assign(chip, chip_mat)
-    chip.parent = pcb
-    for i, (x, y, sx, sy) in enumerate([(0.0045, 0.002, 0.0012, 0.0007),
-                                         (-0.0046, 0.0015, 0.0009, 0.0014),
-                                         (0.003, -0.0042, 0.0016, 0.0006),
-                                         (-0.0028, -0.0045, 0.0008, 0.0008),
-                                         (0.0006, 0.0055, 0.0018, 0.0005),
-                                         (-0.0052, -0.001, 0.0006, 0.0006)]):
-        bpy.ops.mesh.primitive_cube_add(size=1, location=(x, y, 0.00425))
-        smd = bpy.context.active_object
-        smd.scale = (sx, sy, 0.0004)
-        om.assign(smd, smd_mat if i % 2 else chip_mat)
-        smd.parent = pcb
+    build_pcb(pcb, pcb_mat, chip_mat, smd_mat, gold)
     parts["pcb"] = pcb
 
     # 4. Batteria a bottone.
