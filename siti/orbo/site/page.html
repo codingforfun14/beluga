@@ -133,12 +133,13 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 /* 2. Scale */
 #weight { height: 420vh; }
 #weight .pin { background: #000; }
+#scale { -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); }
 .wcopy { position: absolute; left: 0; right: 0; top: max(88px, 11vh); text-align: center; padding: 0 var(--gr) 0 var(--gl); z-index: 2; }
 .wcopy h2 { font-size: clamp(36px, 5vw, 72px); }
 .wcopy p { color: #c9b7a6; font-size: clamp(17px, 1.5vw, 21px); margin-top: 12px; }
 .lcd { position: absolute; display: flex; align-items: center; justify-content: flex-end; gap: .25em; padding-right: .5em; color: #ffd9b3; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; text-shadow: 0 0 .35em rgba(255,170,110,.55); line-height: 1; pointer-events: none; }
 .lcd small { font-size: .5em; opacity: .85; }
-.cmp { position: absolute; left: 0; right: 0; bottom: max(28px, 5vh); display: flex; justify-content: center; gap: clamp(20px, 5vw, 64px); flex-wrap: wrap; font-size: 15px; color: var(--grey); padding: 0 var(--gr) 0 var(--gl); opacity: 0; }
+.cmp { position: absolute; left: 0; right: 0; top: 100%; margin-top: 10px; display: flex; justify-content: center; gap: clamp(20px, 5vw, 64px); flex-wrap: wrap; font-size: 15px; color: var(--grey); padding: 0 var(--gr) 0 var(--gl); opacity: 0; }
 .cmp div { display: flex; align-items: baseline; gap: 8px; }
 .cmp b { color: var(--white); font-weight: 600; font-size: 22px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 
@@ -242,6 +243,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   .cell.hero { grid-row: auto; min-height: 440px; }
   .cell .hint { display: none; }
   .fin .tl { top: 84px; }
+  #scale { -webkit-mask-image: linear-gradient(transparent, #000 16%); mask-image: linear-gradient(transparent, #000 16%); }
   .fin img { top: 20%; height: 48%; -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); }
   .buy .top { grid-template-columns: 1fr; }
   .techrow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -309,12 +311,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       <div class="lcd" id="lcd" aria-hidden="true"><span id="lcdNum">0.00</span><small>g</small></div>
       <div class="wcopy">
         <h2>Lighter than a sheet of paper.</h2>
-        <p>Put one on a lab scale and see.</p>
-      </div>
+        <p id="wsub">Put one on a lab scale and see.</p>
       <div class="cmp" id="cmp">
         <div><b>5.0 g</b>One A4 sheet</div>
         <div><b>4.6 g</b>One ORBO One</div>
         <div><b>0.01 g</b>Scale precision</div>
+      </div>
       </div>
     </div>
   </section>
@@ -771,6 +773,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   const lcdEl = document.getElementById("lcd");
   const lcdNum = document.getElementById("lcdNum");
   const cmp = document.getElementById("cmp");
+  const wsub = document.getElementById("wsub");
   let lcdRect = null, sbox = null;
   const scale = sequence(scanvas, "scale", 60, (seq, im) => {
     seq.ctx.drawImage(im, 0, 0, seq.canvas.width, seq.canvas.height);
@@ -782,13 +785,16 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   function layoutWeight() {
     const vw = wpin.clientWidth, vh = wpin.clientHeight;
     const ar = 1600 / 1000;
-    let w = Math.max(vw, vh * 0.9 * ar), h = w / ar;
-    if (vw < 760) { w = vw * 1.7; h = w / ar; }
-    const x = (vw - w) / 2, y = vh - h * (vw < 760 ? 0.86 : 0.94);
+    // Desktop: the scale fills the lower 80% of the screen, edges faded.
+    // Phone: wider than the screen, with the display just above the bottom.
+    let w, h, y;
+    if (vw < 760) { w = vw * 1.55; h = w / ar; y = vh - 28 - h * 0.87; }
+    else { h = vh * 0.8; w = h * ar; if (w < vw * 0.7) { w = vw * 0.7; h = w / ar; } y = vh - h; }
+    const x = (vw - w) / 2;
     const dpr = Math.min(devicePixelRatio || 1, 2);
     scanvas.width = Math.round(w * dpr); scanvas.height = Math.round(h * dpr);
-    Object.assign(scanvas.style, { width: w + "px", height: h + "px", left: x + "px", top: Math.max(y, vh - h) + "px" });
-    sbox = { x, y: Math.max(y, vh - h), w, h };
+    Object.assign(scanvas.style, { width: w + "px", height: h + "px", left: x + "px", top: y + "px" });
+    sbox = { x, y, w, h };
     if (lcdRect) {
       const r = lcdRect;
       Object.assign(lcdEl.style, {
@@ -815,7 +821,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     lcdNum.textContent = reading(Math.round(f)).toFixed(2);
     const c = clamp((p - 0.74) / 0.08, 0, 1);
     cmp.style.opacity = c;
-    cmp.style.transform = `translateY(${(1 - c) * 16}px)`;
+    cmp.style.transform = `translateY(${(1 - c) * 12 - 34}px)`;
+    wsub.style.opacity = 1 - c;
   }
 
   /* ---------- 3. Specs ---------- */
